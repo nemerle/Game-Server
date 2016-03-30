@@ -1,10 +1,13 @@
-typedef struct  
+#pragma once
+#include <stdint.h>
+struct file_t;
+struct sData_optionLine_t
 {
-	sint8 *optionName;
+    char *optionName;
 	sint8 *optionData;
-}sData_optionLine_t;
+};
 
-typedef struct  
+struct sData_t
 {
 	file_t *file;
 	// current category settings
@@ -13,7 +16,7 @@ typedef struct
 	// option data
 	sint32 optionLineCount;
 	sData_optionLine_t *optionLine;
-}sData_t;
+};
 
 sData_t *sData_open(sint8 *path);
 bool sData_nextCategory(sData_t *sData);
