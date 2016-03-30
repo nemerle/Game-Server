@@ -1,5 +1,6 @@
-#include "global.h"
+#include "npc.h"
 
+#include "Global.h"
 
 //void npc_test(mapChannelClient_t *client)
 //{
@@ -83,13 +84,13 @@
  */
 void npc_globalUpdateConversationStatus(mapChannelClient_t *client)
 {
-	sint32 viewX1 = client->player->actor->cellLocation.x-CELL_VIEWRANGE;
-	sint32 viewX2 = client->player->actor->cellLocation.x+CELL_VIEWRANGE;
-	sint32 viewZ1 = client->player->actor->cellLocation.z-CELL_VIEWRANGE;
-	sint32 viewZ2 = client->player->actor->cellLocation.z+CELL_VIEWRANGE;
-	for(sint32 ix=viewX1; ix<=viewX2; ix++)
+    int32_t viewX1 = client->player->actor->cellLocation.x-CELL_VIEWRANGE;
+    int32_t viewX2 = client->player->actor->cellLocation.x+CELL_VIEWRANGE;
+    int32_t viewZ1 = client->player->actor->cellLocation.z-CELL_VIEWRANGE;
+    int32_t viewZ2 = client->player->actor->cellLocation.z+CELL_VIEWRANGE;
+    for(int32_t ix=viewX1; ix<=viewX2; ix++)
 	{
-		for(sint32 iz=viewZ1; iz<=viewZ2; iz++)
+        for(int32_t iz=viewZ1; iz<=viewZ2; iz++)
 		{
 			mapCell_t *nMapCell = cellMgr_tryGetCell(client->mapChannel, ix, iz);
 			if( nMapCell )
@@ -136,9 +137,9 @@ void npc_creature_updateConversationStatus(mapChannelClient_t *client, creature_
 			if( missionLogEntry->state >= mission->stateCount )
 				continue;
 			// search for objective or mission related updates
-			sint32 scriptlineStart = mission->stateMapping[missionLogEntry->state];
-			sint32 scriptlineEnd = mission->stateMapping[missionLogEntry->state+1];
-			for(sint32 l=scriptlineStart; l<scriptlineEnd; l++)
+            int32_t scriptlineStart = mission->stateMapping[missionLogEntry->state];
+            int32_t scriptlineEnd = mission->stateMapping[missionLogEntry->state+1];
+            for(int32_t l=scriptlineStart; l<scriptlineEnd; l++)
 			{
 				missionScriptLine_t* scriptline = mission->scriptLines + l;
 				if( scriptline->command == M_OP_COMPLETEOBJECTIVE )
@@ -213,7 +214,7 @@ void npc_creature_updateConversationStatus(mapChannelClient_t *client, creature_
 /*
  * Send by the client when the 'continue' button is pressed when talking to a mission objective relevant NPC
  */
-void npc_recv_CompleteNPCObjective(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void npc_recv_CompleteNPCObjective(mapChannelClient_t *client, uint8 *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
@@ -237,7 +238,7 @@ void npc_recv_CompleteNPCObjective(mapChannelClient_t *client, uint8 *pyString, 
 		return;
 	// find the related mission
 	mission_t* mission = NULL;
-	for(sint32 i=0; i<npcData->relatedMissionCount; i++)
+    for(int32_t i=0; i<npcData->relatedMissionCount; i++)
 	{
 		mission_t* rMission = mission_getByIndex(npcData->relatedMissions[i].missionIndex);
 		if( rMission == NULL )
@@ -257,9 +258,9 @@ void npc_recv_CompleteNPCObjective(mapChannelClient_t *client, uint8 *pyString, 
 	// find objective
 	if( missionLogEntry->state >= mission->stateCount )
 		return;
-	sint32 scriptlineStart = mission->stateMapping[missionLogEntry->state];
-	sint32 scriptlineEnd = mission->stateMapping[missionLogEntry->state+1];
-	for(sint32 l=scriptlineStart; l<scriptlineEnd; l++)
+    int32_t scriptlineStart = mission->stateMapping[missionLogEntry->state];
+    int32_t scriptlineEnd = mission->stateMapping[missionLogEntry->state+1];
+    for(int32_t l=scriptlineStart; l<scriptlineEnd; l++)
 	{
 		missionScriptLine_t* scriptline = mission->scriptLines + l;
 		if( scriptline->command == M_OP_COMPLETEOBJECTIVE )
@@ -282,7 +283,7 @@ void npc_recv_CompleteNPCObjective(mapChannelClient_t *client, uint8 *pyString, 
 /*
  * Send by the client when completing a mission at the debriefing/collector NPC
  */
-void npc_recv_CompleteNPCMission(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void npc_recv_CompleteNPCMission(mapChannelClient_t *client, uint8 *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
@@ -304,7 +305,7 @@ void npc_recv_CompleteNPCMission(mapChannelClient_t *client, uint8 *pyString, si
 		return;
 	// find the related mission
 	mission_t* mission = NULL;
-	for(sint32 i=0; i<npcData->relatedMissionCount; i++)
+    for(int32_t i=0; i<npcData->relatedMissionCount; i++)
 	{
 		mission_t* rMission = mission_getByIndex(npcData->relatedMissions[i].missionIndex);
 		if( rMission == NULL )
@@ -324,9 +325,9 @@ void npc_recv_CompleteNPCMission(mapChannelClient_t *client, uint8 *pyString, si
 	if( missionLogEntry->state != (mission->stateCount-1) )
 		return; // mission not complete
 	// everything ok, give reward
-	sint32 rewardXp = mission_getReward_experience(mission);
-	sint32 rewardPrestige = mission_getReward_prestige(mission);
-	sint32 rewardCredits = mission_getReward_credits(mission);
+    int32_t rewardXp = mission_getReward_experience(mission);
+    int32_t rewardPrestige = mission_getReward_prestige(mission);
+    int32_t rewardCredits = mission_getReward_credits(mission);
 	if( rewardXp > 0 )
 		manifestation_GainExperience(client, rewardXp);
 	if( rewardPrestige > 0 )
@@ -335,8 +336,8 @@ void npc_recv_CompleteNPCMission(mapChannelClient_t *client, uint8 *pyString, si
 		manifestation_GainCredits(client, rewardCredits);
 	// todo: Item rewards (and item script commands too)
 	// update mission state
-	sint32 missionLogEntryIndex = -1;
-	for(sint32 i=0; i<client->player->activeMissionCount; i++)
+    int32_t missionLogEntryIndex = -1;
+    for(int32_t i=0; i<client->player->activeMissionCount; i++)
 	{
 		if( client->player->missionLog[i].missionIndex == mission->missionIndex )
 		{
@@ -348,7 +349,7 @@ void npc_recv_CompleteNPCMission(mapChannelClient_t *client, uint8 *pyString, si
 	{
 		// remove missionLogEntry
 		client->player->activeMissionCount--;
-		for(sint32 i=missionLogEntryIndex; i<client->player->activeMissionCount; i++)
+        for(int32_t i=missionLogEntryIndex; i<client->player->activeMissionCount; i++)
 		{
 			memcpy(&client->player->missionLog[i], &client->player->missionLog[i+1], sizeof(missionLogEntry_t));
 		}
@@ -368,7 +369,7 @@ void npc_recv_CompleteNPCMission(mapChannelClient_t *client, uint8 *pyString, si
 /*
  * Send by the client when the 'accept' button on the mission briefing window is pressed.
  */
-void npc_recv_AssignNPCMission(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen) // alias 'AcceptMission'
+void npc_recv_AssignNPCMission(mapChannelClient_t *client, uint8 *pyString, int32_t pyStringLen) // alias 'AcceptMission'
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
@@ -395,7 +396,7 @@ void npc_recv_AssignNPCMission(mapChannelClient_t *client, uint8 *pyString, sint
 		return;
 	}
 	// find mission
-	for(sint32 i=0; i<npcData->relatedMissionCount; i++)
+    for(int32_t i=0; i<npcData->relatedMissionCount; i++)
 	{
 		mission_t* mission = mission_getByIndex(npcData->relatedMissions[i].missionIndex);
 		if( mission == NULL )
@@ -421,14 +422,14 @@ void npc_recv_AssignNPCMission(mapChannelClient_t *client, uint8 *pyString, sint
 #define MISSION_STATE_COMPLETED		-2	// mission already done (no more available)
 #define MISSION_STATE_COMPLETEABLE	-3	// completed mission can be delivered to NPC
 
-void npc_recv_RequestNPCConverse(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void npc_recv_RequestNPCConverse(mapChannelClient_t *client, uint8 *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
 	if( !pym_unpackTuple_begin(&pums) )
 		return;
-	sint32 actionId = pym_unpackInt(&pums);
-	sint32 actionArgId = pym_unpackInt(&pums);
+    int32_t actionId = pym_unpackInt(&pums);
+    int32_t actionArgId = pym_unpackInt(&pums);
 	unsigned long long entityId = pym_unpackLongLong(&pums);
 	if( pums.unpackErrorEncountered )
 		return;
@@ -471,7 +472,7 @@ void npc_recv_RequestNPCConverse(mapChannelClient_t *client, uint8 *pyString, si
 		npcData->relatedMissionCount = 64;
 	}
 	// collect player state info about provided missions
-	sint32 missionState[64]; // we assume no NPC will ever offer more than 64 missions, -2 means mission completed, -1 means not accepted
+    int32_t missionState[64]; // we assume no NPC will ever offer more than 64 missions, -2 means mission completed, -1 means not accepted
 	for(uint32 i=0; i<npcData->relatedMissionCount; i++)
 	{
 		missionState[i] = MISSION_STATE_NOTACCEPTED;
@@ -500,9 +501,9 @@ void npc_recv_RequestNPCConverse(mapChannelClient_t *client, uint8 *pyString, si
 	}
 
 	// count mission types
-	sint32 countMissionAvailable = 0;
-	sint32 countMissionCompletable = 0;
-	sint32 countMissionObjectiveCompletable = 0;
+    int32_t countMissionAvailable = 0;
+    int32_t countMissionCompletable = 0;
+    int32_t countMissionObjectiveCompletable = 0;
 	for(uint32 i=0; i<npcData->relatedMissionCount; i++)
 	{
 		if( missionState[i] == MISSION_STATE_COMPLETED )
@@ -551,9 +552,9 @@ void npc_recv_RequestNPCConverse(mapChannelClient_t *client, uint8 *pyString, si
 			if( missionState[i] <= 0 )
 				continue;
 			mission_t* mission = mission_getByIndex(npcData->relatedMissions[i].missionIndex);
-			sint32 scriptlineStart = mission->stateMapping[missionState[i]];
-			sint32 scriptlineEnd = mission->stateMapping[missionState[i]+1];
-			for(sint32 l=scriptlineStart; l<scriptlineEnd; l++)
+            int32_t scriptlineStart = mission->stateMapping[missionState[i]];
+            int32_t scriptlineEnd = mission->stateMapping[missionState[i]+1];
+            for(int32_t l=scriptlineStart; l<scriptlineEnd; l++)
 			{
 				missionScriptLine_t* scriptline = mission->scriptLines + l;
 				if( scriptline->command == M_OP_COMPLETEOBJECTIVE )
@@ -599,7 +600,7 @@ void npc_recv_RequestNPCConverse(mapChannelClient_t *client, uint8 *pyString, si
 	}
 
 	//mission_t *missionAvailableList[16];
-	//sint32 missionAvailableCount; 
+    //int32_t missionAvailableCount;
 	//// send greeting
 	//pym_addInt(&pms, 0); // key: CONVO_TYPE_GREETING
 	////pym_tuple_begin(&pms); // greeting data
@@ -613,7 +614,7 @@ void npc_recv_RequestNPCConverse(mapChannelClient_t *client, uint8 *pyString, si
 	//		// CONVO_TYPE_MISSIONCOMPLETE (3)
 	//		pym_addInt(&pms, 3); // key: CONVO_TYPE_MISSIONCOMPLETE
 	//		pym_dict_begin(&pms); // mission list
-	//		for(sint32 i=0; i<missionAvailableCount; i++)
+    //		for(int32_t i=0; i<missionAvailableCount; i++)
 	//		{
 	//			mission_t *mission = missionAvailableList[i];
 	//			if( !mission )
@@ -654,7 +655,7 @@ void npc_recv_RequestNPCConverse(mapChannelClient_t *client, uint8 *pyString, si
 	netMgr_pythonAddMethodCallRaw(client->cgm, creature->actor.entityId, 433, pym_getData(&pms), pym_getLen(&pms));
 }
 
-void npc_recv_RequestNPCVending(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void npc_recv_RequestNPCVending(mapChannelClient_t *client, uint8 *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
@@ -682,7 +683,7 @@ void npc_recv_RequestNPCVending(mapChannelClient_t *client, uint8 *pyString, sin
 	pym_tuple_begin(&pms);
 	pym_dict_begin(&pms);
 	// iterate sold item list
-	for(sint32 i=0; i<vendorData->numberOfSoldItems; i++)
+    for(int32_t i=0; i<vendorData->numberOfSoldItems; i++)
 	{
 		// note: We create the items in this function (on-demand) to avoid generating lots of possibly unused vendor items at server startup
 		// do we need to create the 'display-item'?
@@ -715,7 +716,7 @@ void npc_recv_RequestNPCVending(mapChannelClient_t *client, uint8 *pyString, sin
  * Called by the client when an item is sold to a vendor
  * RPC parameters passed: (vendorEntityId, itemId, quantity)
  */
-void npc_recv_RequestVendorSale(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void npc_recv_RequestVendorSale(mapChannelClient_t *client, uint8 *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
@@ -723,13 +724,13 @@ void npc_recv_RequestVendorSale(mapChannelClient_t *client, uint8 *pyString, sin
 		return;
 	unsigned long long vendorEntityId = pym_unpackLongLong(&pums);
 	unsigned long long itemEntityId = pym_unpackLongLong(&pums);
-	sint32 itemQuantity = pym_unpackInt(&pums);
+    int32_t itemQuantity = pym_unpackInt(&pums);
 	if( pums.unpackErrorEncountered )
 		return;
 	// note: Players can only sell items directly from their personal inventory
 	//       so we only have to scan there for the item entityId
-	sint32 slotIndex = -1;
-	for(sint32 i=0; i<250; i++)
+    int32_t slotIndex = -1;
+    for(int32_t i=0; i<250; i++)
 	{
 		if( (sint64)client->inventory.personalInventory[i] == (sint64)itemEntityId )
 		{
@@ -750,8 +751,8 @@ void npc_recv_RequestVendorSale(mapChannelClient_t *client, uint8 *pyString, sin
 		return;
 	}
 	// get sell price
-	sint32 realItemQuantity = min(itemQuantity, soldItem->stacksize);
-	sint32 sellPrice = soldItem->itemTemplate->item.sellPrice * realItemQuantity;
+    int32_t realItemQuantity = min(itemQuantity, soldItem->stacksize);
+    int32_t sellPrice = soldItem->itemTemplate->item.sellPrice * realItemQuantity;
 	// remove item
 	// todo: Handle stacksizes correctly and only decrease item by quantity parameter
 	inventory_removeItemBySlot(client, INVENTORY_PERSONAL, slotIndex);
@@ -765,7 +766,7 @@ void npc_recv_RequestVendorSale(mapChannelClient_t *client, uint8 *pyString, sin
  * Called by the client when an item is bought from a vendor
  * RPC parameters passed: (vendorEntityId, itemId, quantity)
  */
-void npc_recv_RequestVendorPurchase(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void npc_recv_RequestVendorPurchase(mapChannelClient_t *client, uint8 *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
@@ -773,7 +774,7 @@ void npc_recv_RequestVendorPurchase(mapChannelClient_t *client, uint8 *pyString,
 		return;
 	unsigned long long vendorEntityId = pym_unpackLongLong(&pums);
 	unsigned long long itemEntityId = pym_unpackLongLong(&pums);
-	sint32 itemQuantity = pym_unpackInt(&pums);
+    int32_t itemQuantity = pym_unpackInt(&pums);
 	if( pums.unpackErrorEncountered )
 		return;
 	if( itemQuantity <= 0 )
@@ -786,7 +787,7 @@ void npc_recv_RequestVendorPurchase(mapChannelClient_t *client, uint8 *pyString,
 		return;
 	}
 	// has the player enough credits?
-	sint32 buyPrice = selectedVendorItem->itemTemplate->item.buyPrice * itemQuantity;
+    int32_t buyPrice = selectedVendorItem->itemTemplate->item.buyPrice * itemQuantity;
 	if( client->player->credits < buyPrice )
 		return; // not enough credits
 	// duplicate item
@@ -797,12 +798,12 @@ void npc_recv_RequestVendorPurchase(mapChannelClient_t *client, uint8 *pyString,
 	item_sendItemCreation(client, boughtItem);
 	// add item to inventory
 	item_t* tempItemPtr = boughtItem;
-	sint32 desiredStacksize = tempItemPtr->stacksize;
+    int32_t desiredStacksize = tempItemPtr->stacksize;
 	boughtItem = inventory_addItemToInventory(client, boughtItem);
 	if( boughtItem == NULL )
 	{
 		// item could not be added to inventory
-		sint32 appliedRestStackSize = tempItemPtr->stacksize;
+        int32_t appliedRestStackSize = tempItemPtr->stacksize;
 		if( appliedRestStackSize == desiredStacksize )
 		{
 			// not even 1x item could be added to the inventory
@@ -829,7 +830,7 @@ void npc_recv_RequestVendorPurchase(mapChannelClient_t *client, uint8 *pyString,
 sint8 npcLoadState;
 void _cb_npc_init(void *param, diJob_npcListData_t *jobData)
 {
-	for(sint32 i=0; i<jobData->outNpcCount; i++)
+    for(int32_t i=0; i<jobData->outNpcCount; i++)
 	{
 		di_npcData_t *npcData = jobData->outNpcList+i;
 		// find the creature type
@@ -844,7 +845,7 @@ void _cb_npc_init(void *param, diJob_npcListData_t *jobData)
 		memset(npc, 0x00, sizeof(npcData_t));
 		creatureType->npcData = npc;
 		// set appearance info (maybe move appearance data into actor table?)
-		for(sint32 s=0; s<SWAPSET_SIZE; s++)
+        for(int32_t s=0; s<SWAPSET_SIZE; s++)
 		{
 			creatureType->appearanceData[s].classId = npcData->appearanceData[s].classId;
 			creatureType->appearanceData[s].hue = npcData->appearanceData[s].hue;

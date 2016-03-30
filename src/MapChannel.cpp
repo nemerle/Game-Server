@@ -1,5 +1,8 @@
+#include "MapChannel.h"
+
 #include "Global.h"
 
+#include <string.h>
 /*
 	A MapChannel in general is a isolated thread of the server that is 100% responsible for one or multiple maps
 	Whenever a client selects a character the clientinstance is passed to the MapChannel and is no more processed by the main thread.
@@ -9,7 +12,7 @@
 hashTable_t ht_mapChannelsByContextId;
 mapChannelList_t *global_channelList; //20110827 @dennton
 
-void mapteleporter_teleportEntity(sint32 destX,sint32 destY, sint32 destZ, sint32 mapContextId, mapChannelClient_t *player)
+void mapteleporter_teleportEntity(int32_t destX,int32_t destY, int32_t destZ, int32_t mapContextId, mapChannelClient_t *player)
 {
     destY += 700;
 	printf("teleport to: x y z map - %d %d %d %d \n",destX,destY,destZ,mapContextId);
@@ -22,7 +25,7 @@ void mapteleporter_teleportEntity(sint32 destX,sint32 destY, sint32 destZ, sint3
 			Thread::LockMutex(&player->cgm->cs_general);
 			cellMgr_removeFromWorld(player);
 			// remove from list
-			for(sint32 i=0; i<player->mapChannel->playerCount; i++)
+            for(int32_t i=0; i<player->mapChannel->playerCount; i++)
 			{
 				if( player == player->mapChannel->playerList[i] )
 				{
@@ -55,8 +58,8 @@ void mapteleporter_teleportEntity(sint32 destX,sint32 destY, sint32 destZ, sint3
 			pym_addInt(&pms, mapContextId);	// gameContextId (alias mapId)
 			pym_addInt(&pms, 0);	// instanceId ( not important for now )
 			// find map version
-			sint32 mapVersion = 0; // default = 0;
-			for(sint32 i=0; i<mapInfoCount; i++)
+            int32_t mapVersion = 0; // default = 0;
+            for(int32_t i=0; i<mapInfoCount; i++)
 			{
 				if( mapInfoArray[i].contextId == mapContextId )
 				{
@@ -91,7 +94,7 @@ void mapteleporter_teleportEntity(sint32 destX,sint32 destY, sint32 destZ, sint3
 
 				
 			//---search new mapchannel
-			for(sint32 chan=0; chan < global_channelList->mapChannelCount; chan++)
+            for(int32_t chan=0; chan < global_channelList->mapChannelCount; chan++)
 			{
                mapChannel_t *mapChannel = global_channelList->mapChannelArray+chan;
 			   if(mapChannel->mapInfo->contextId == mapContextId)
@@ -105,7 +108,7 @@ void mapteleporter_teleportEntity(sint32 destX,sint32 destY, sint32 destZ, sint3
 			Thread::LockMutex(&player->mapChannel->criticalSection);
 			mapChannel->playerList[mapChannel->playerCount] = player;
 			mapChannel->playerCount++;
-			hashTable_set(&mapChannel->ht_socketToClient, (uint32)player->cgm->socket, player);
+            hashTable_set(&mapChannel->ht_socketToClient, (uint32_t)player->cgm->socket, player);
 			Thread::UnlockMutex(&mapChannel->criticalSection);
 			
 			player->player->actor->posX = destX; 
@@ -127,7 +130,7 @@ void mapteleporter_checkForEntityInRange(mapChannel_t *mapChannel)
     return; // disabled until someone fixes this and gets rid of all the memory leaks (when using 'new', also use 'delete')
 	//pyMarshalString_t pms;
 
-	sint32 tCount =0;
+    int32_t tCount =0;
 	float minimumRange = 1.8f;
 	float difX = 0.0f;
 	float difY = 0.0f;
@@ -135,9 +138,9 @@ void mapteleporter_checkForEntityInRange(mapChannel_t *mapChannel)
 	float dist = 0.0f;
 	minimumRange *= minimumRange;
 	//test zoneteleporters map. should be builded from db
-	sint32 **porting_locs = new sint32*[4];
+    int32_t **porting_locs = new int32_t*[4];
 	// values 0-9: source-contextid, source xyz ,dest xyz , dest-contextid, cell-x, cell-z
-	porting_locs[0] = new sint32 [10]; // zone teleporter #1: wilderness -> divide
+    porting_locs[0] = new int32_t [10]; // zone teleporter #1: wilderness -> divide
 	porting_locs[0][0] = 1220;
 	porting_locs[0][1] = 300;
 	porting_locs[0][2] = 142;
@@ -146,9 +149,9 @@ void mapteleporter_checkForEntityInRange(mapChannel_t *mapChannel)
 	porting_locs[0][5] = 176;
 	porting_locs[0][6] = 634;
 	porting_locs[0][7] = 1148;
-	porting_locs[0][8] = (uint32)((porting_locs[0][1] / CELL_SIZE) + CELL_BIAS);
-	porting_locs[0][9] = (uint32)((porting_locs[0][3] / CELL_SIZE) + CELL_BIAS);
-	porting_locs[1] = new sint32 [10]; // zone teleporter #1: divide -> wilderness
+    porting_locs[0][8] = (uint32_t)((porting_locs[0][1] / CELL_SIZE) + CELL_BIAS);
+    porting_locs[0][9] = (uint32_t)((porting_locs[0][3] / CELL_SIZE) + CELL_BIAS);
+    porting_locs[1] = new int32_t [10]; // zone teleporter #1: divide -> wilderness
 	porting_locs[1][0] = 1148;
 	porting_locs[1][1] = -1008;
 	porting_locs[1][2] = 180;
@@ -157,9 +160,9 @@ void mapteleporter_checkForEntityInRange(mapChannel_t *mapChannel)
 	porting_locs[1][5] = 152;
 	porting_locs[1][6] = -538;
 	porting_locs[1][7] = 1220;
-	porting_locs[1][8] = (uint32)((porting_locs[1][1] / CELL_SIZE) + CELL_BIAS);
-	porting_locs[1][9] = (uint32)((porting_locs[1][3] / CELL_SIZE) + CELL_BIAS);
-	porting_locs[2] = new sint32 [10]; //zone zeleporter #2: wilderness -> divide
+    porting_locs[1][8] = (uint32_t)((porting_locs[1][1] / CELL_SIZE) + CELL_BIAS);
+    porting_locs[1][9] = (uint32_t)((porting_locs[1][3] / CELL_SIZE) + CELL_BIAS);
+    porting_locs[2] = new int32_t [10]; //zone zeleporter #2: wilderness -> divide
 	porting_locs[2][0] = 1220;
 	porting_locs[2][1] = 891;
 	porting_locs[2][2] = 268;
@@ -168,9 +171,9 @@ void mapteleporter_checkForEntityInRange(mapChannel_t *mapChannel)
 	porting_locs[2][5] = 173;
 	porting_locs[2][6] = 1193;
 	porting_locs[2][7] = 1148;
-	porting_locs[2][8] = (uint32)((porting_locs[2][1] / CELL_SIZE) + CELL_BIAS);
-	porting_locs[2][9] = (uint32)((porting_locs[2][3] / CELL_SIZE) + CELL_BIAS);
-	porting_locs[3] = new sint32 [10]; //zone teleporter #2: divide -> wilderness
+    porting_locs[2][8] = (uint32_t)((porting_locs[2][1] / CELL_SIZE) + CELL_BIAS);
+    porting_locs[2][9] = (uint32_t)((porting_locs[2][3] / CELL_SIZE) + CELL_BIAS);
+    porting_locs[3] = new int32_t [10]; //zone teleporter #2: divide -> wilderness
 	porting_locs[3][0] = 1148;
 	porting_locs[3][1] = 499;
 	porting_locs[3][2] = 184;
@@ -179,11 +182,11 @@ void mapteleporter_checkForEntityInRange(mapChannel_t *mapChannel)
 	porting_locs[3][5] = 273;
 	porting_locs[3][6] = 65;
 	porting_locs[3][7] = 1220;
-	porting_locs[3][8] = (uint32)((porting_locs[3][1] / CELL_SIZE) + CELL_BIAS);
-	porting_locs[3][9] = (uint32)((porting_locs[3][3] / CELL_SIZE) + CELL_BIAS);
+    porting_locs[3][8] = (uint32_t)((porting_locs[3][1] / CELL_SIZE) + CELL_BIAS);
+    porting_locs[3][9] = (uint32_t)((porting_locs[3][3] / CELL_SIZE) + CELL_BIAS);
  
 	//---search through the whole teleporter list
-	for (sint32 x =0; x < 4; x++)
+    for (int32_t x =0; x < 4; x++)
 	{
 		
 	    float mPosX = porting_locs[x][1]; //teleporter x-pos 
@@ -199,13 +202,13 @@ void mapteleporter_checkForEntityInRange(mapChannel_t *mapChannel)
 		playerList = &mapCell->ht_playerNotifyList[0];
 
 		// check players in range
-		for(sint32 i=0; i<tCount; i++)
+        for(int32_t i=0; i<tCount; i++)
 		{
 			if( playerList == NULL) break; //no player found
 			mapChannelClient_t *player = playerList[i];
 			if(player->player->actor->stats.healthCurrent<=0) break;
-			difX = (sint32)(player->player->actor->posX) - mPosX;
-			difZ = (sint32)(player->player->actor->posZ) - mPosZ;
+            difX = (int32_t)(player->player->actor->posX) - mPosX;
+            difZ = (int32_t)(player->player->actor->posZ) - mPosZ;
 			dist = difX*difX + difZ*difZ;
 			//player(s) in range: do teleporting
 			if( (dist <= minimumRange) &&   (porting_locs[x][0] == player->mapChannel->mapInfo->contextId))
@@ -248,7 +251,7 @@ void _cb_mapChannel_addNewPlayer(void *param, diJob_characterData_t *jobData)
 	Thread::LockMutex(&mapChannel->criticalSection);
 	mapChannel->playerList[mapChannel->playerCount] = mc;
 	mapChannel->playerCount++;
-	hashTable_set(&mapChannel->ht_socketToClient, (uint32)mc->cgm->socket, mc);
+    hashTable_set(&mapChannel->ht_socketToClient, (uint32_t)mc->cgm->socket, mc);
 	Thread::UnlockMutex(&mapChannel->criticalSection);
 }
 
@@ -272,10 +275,10 @@ void mapChannel_addNewPlayer(mapChannel_t *mapChannel, clientGamemain_t *cgm)
 	//}
 	//mapChannel->playerList[mapChannel->playerCount] = mc;
 	//mapChannel->playerCount++;
-	//hashTable_set(&mapChannel->ht_socketToClient, (uint32)cgm->socket, mc);
+    //hashTable_set(&mapChannel->ht_socketToClient, (uint32_t)cgm->socket, mc);
 	//// create new actor...
 	//
-	//// void DataInterface_Character_getCharacterData(unsigned long long userID, uint32 slotIndex, void (*cb)(void *param, diJob_characterData_t *jobData), void *param)
+    //// void DataInterface_Character_getCharacterData(unsigned long long userID, uint32_t slotIndex, void (*cb)(void *param, diJob_characterData_t *jobData), void *param)
 }
 
 void mapChannel_removePlayer(mapChannelClient_t *client)
@@ -290,7 +293,7 @@ void mapChannel_removePlayer(mapChannelClient_t *client)
 	if( client->disconnected == false )
 		GameMain_PassClientToCharacterSelection(client->cgm);
 	// remove from list
-	for(sint32 i=0; i<client->mapChannel->playerCount; i++)
+    for(int32_t i=0; i<client->mapChannel->playerCount; i++)
 	{
 		if( client == client->mapChannel->playerList[i] )
 		{
@@ -312,7 +315,7 @@ void mapChannel_removePlayer(mapChannelClient_t *client)
 	free(client);
 }
 
-void mapChannel_registerTimer(mapChannel_t *mapChannel, sint32 period, void *param, bool (*cb)(mapChannel_t *mapChannel, void *param, sint32 timePassed))
+void mapChannel_registerTimer(mapChannel_t *mapChannel, int32_t period, void *param, bool (*cb)(mapChannel_t *mapChannel, void *param, int32_t timePassed))
 {
 	mapChannelTimer_t *timer = (mapChannelTimer_t*)malloc(sizeof(mapChannelTimer_t));
 	timer->period = period;
@@ -324,7 +327,7 @@ void mapChannel_registerTimer(mapChannel_t *mapChannel, sint32 period, void *par
 
 //void mapChannel_launchMissileForWeapon(mapChannelClient_t* client, item_t* weapon)
 //{
-//	sint32 damageRange = weapon->itemTemplate->weapon.maxDamage-weapon->itemTemplate->weapon.minDamage;
+//	int32_t damageRange = weapon->itemTemplate->weapon.maxDamage-weapon->itemTemplate->weapon.minDamage;
 //	damageRange = max(damageRange, 1); // to avoid division by zero in the next line
 //	
 //	if( weapon->itemTemplate->weapon.altActionId == 1 )
@@ -384,7 +387,7 @@ void mapChannel_registerAutoFireTimer(mapChannelClient_t* cm)
 	if( itemWeapon == NULL || itemWeapon->itemTemplate->item.type != ITEMTYPE_WEAPON )
 		return; // invalid entity or incorrect item type
 	//itemWeapon->itemTemplate->weapon.refireTime
-	sint32 refireTime = 250; // we get this info from the duration of the action?
+    int32_t refireTime = 250; // we get this info from the duration of the action?
 
 	mapChannelAutoFireTimer_t timer;
 	timer.delay = refireTime;
@@ -442,7 +445,7 @@ bool CheckTempCharacter(di_characterData_t *tcd)
 }
 
 
-void mapChannel_recv_mapLoaded(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen)
+void mapChannel_recv_mapLoaded(mapChannelClient_t *cm, uint8 *pyString, int32_t pyStringLen)
 {
 	manifestation_createPlayerCharacter(cm->mapChannel, cm, cm->tempCharacterData);
 	communicator_registerPlayer(cm);
@@ -458,7 +461,7 @@ void mapChannel_recv_mapLoaded(mapChannelClient_t *cm, uint8 *pyString, sint32 p
 	}
 }
 
-void mapChannel_recv_LogoutRequest(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen)
+void mapChannel_recv_LogoutRequest(mapChannelClient_t *cm, uint8 *pyString, int32_t pyStringLen)
 {
 	pyMarshalString_t pms;
 	// send time remaining to logout
@@ -471,7 +474,7 @@ void mapChannel_recv_LogoutRequest(mapChannelClient_t *cm, uint8 *pyString, sint
 	cm->logoutActive = true;
 }
 
-void mapChannel_recv_CharacterLogout(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen)
+void mapChannel_recv_CharacterLogout(mapChannelClient_t *cm, uint8 *pyString, int32_t pyStringLen)
 {
 	//pyMarshalString_t pms;
 	// pass to character selection
@@ -480,7 +483,7 @@ void mapChannel_recv_CharacterLogout(mapChannelClient_t *cm, uint8 *pyString, si
 	cm->removeFromMap = true;
 }
 
-void mapChannel_recv_ClearTrackingTarget(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen)
+void mapChannel_recv_ClearTrackingTarget(mapChannelClient_t *cm, uint8 *pyString, int32_t pyStringLen)
 {
 	pyMarshalString_t pms;
 	// send new tracking target
@@ -491,7 +494,7 @@ void mapChannel_recv_ClearTrackingTarget(mapChannelClient_t *cm, uint8 *pyString
 	netMgr_pythonAddMethodCallRaw(cm->cgm, cm->player->actor->entityId, SetTrackingTarget, pym_getData(&pms), pym_getLen(&pms));
 }
 
-void mapChannel_recv_SetTrackingTarget(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen)
+void mapChannel_recv_SetTrackingTarget(mapChannelClient_t *cm, uint8 *pyString, int32_t pyStringLen)
 {
 	// unpack new tracking target
 	pyUnmarshalString_t pums;
@@ -508,7 +511,7 @@ void mapChannel_recv_SetTrackingTarget(mapChannelClient_t *cm, uint8 *pyString, 
 	netMgr_pythonAddMethodCallRaw(cm->cgm, cm->player->actor->entityId, SetTrackingTarget, pym_getData(&pms), pym_getLen(&pms));
 }
 
-void mapChannel_processPythonRPC(mapChannelClient_t *cm, uint32 MethodID, uint8 *pyString, sint32 pyStringLen)
+void mapChannel_processPythonRPC(mapChannelClient_t *cm, uint32_t MethodID, uint8 *pyString, int32_t pyStringLen)
 {
 	// check if 'O'
 	if( *pyString != 'O' )
@@ -675,15 +678,15 @@ void mapChannel_processPythonRPC(mapChannelClient_t *cm, uint32 MethodID, uint8 
 #pragma pack(1)
 typedef struct  
 {
-	sint32 contextId;
-	sint32 pX;
-	sint32 pY;
-	sint32 pZ;
+    int32_t contextId;
+    int32_t pX;
+    int32_t pY;
+    int32_t pZ;
 }movementLogEntry_t;
 #pragma pack()
 
 HANDLE hMovementLogFile = NULL;
-void mapChannel_logMovement(sint32 contextId, sint32 x, sint32 y, sint32 z)
+void mapChannel_logMovement(int32_t contextId, int32_t x, int32_t y, int32_t z)
 {
 	return;
 	if( hMovementLogFile == NULL )
@@ -703,17 +706,17 @@ void mapChannel_logMovement(sint32 contextId, sint32 x, sint32 y, sint32 z)
 }
 
 
-void mapChannel_decodeMovementPacket(mapChannelClient_t *mc, uint8 *data, uint32 len)
+void mapChannel_decodeMovementPacket(mapChannelClient_t *mc, uint8 *data, uint32_t len)
 {
 	if( mc->removeFromMap )
 		return;
 	if( mc->player == NULL )
 		return;
 	netCompressedMovement_t netMovement;
-	uint32 pIdx = 0;
-	uint32 counterA = *(uint32*)(data+pIdx); pIdx += 4;
-	uint32 ukn1 = *(uint32*)(data+pIdx); pIdx += 4;
-	uint32 counterB = *(uint32*)(data+pIdx); pIdx += 4;
+    uint32_t pIdx = 0;
+    uint32_t counterA = *(uint32_t*)(data+pIdx); pIdx += 4;
+    uint32_t ukn1 = *(uint32_t*)(data+pIdx); pIdx += 4;
+    uint32_t counterB = *(uint32_t*)(data+pIdx); pIdx += 4;
 	if( data[pIdx] != 2 )
 		__debugbreak();
 	pIdx++;
@@ -728,12 +731,12 @@ void mapChannel_decodeMovementPacket(mapChannelClient_t *mc, uint8 *data, uint32
 		__debugbreak();
 	if( data[pIdx+7] != 0x2A )
 		__debugbreak();
-	sint32 val24b = (data[pIdx+2]<<16) | (data[pIdx+4]<<8) | (data[pIdx+6]);
+    int32_t val24b = (data[pIdx+2]<<16) | (data[pIdx+4]<<8) | (data[pIdx+6]);
 	if( val24b&0x00800000 )
 		val24b |= 0xFF000000;
 	netMovement.posX24b = val24b;
 	float posX = (float)val24b / 256.0f;
-	sint32 vLogX = val24b;
+    int32_t vLogX = val24b;
 	mc->player->actor->posX = posX;
 	pIdx += 8;
 	// posY
@@ -746,7 +749,7 @@ void mapChannel_decodeMovementPacket(mapChannelClient_t *mc, uint8 *data, uint32
 		val24b |= 0xFF000000;
 	netMovement.posY24b = val24b;
 	float posY = (float)val24b / 256.0f;
-	sint32 vLogY = val24b;
+    int32_t vLogY = val24b;
 	mc->player->actor->posY = posY;
 	pIdx += 8;
 	// posZ
@@ -759,7 +762,7 @@ void mapChannel_decodeMovementPacket(mapChannelClient_t *mc, uint8 *data, uint32
 		val24b |= 0xFF000000;
 	netMovement.posZ24b = val24b;
 	float posZ = (float)val24b / 256.0f;
-	sint32 vLogZ = val24b;
+    int32_t vLogZ = val24b;
 	mc->player->actor->posZ = posZ;
 	pIdx += 8;
 	// read velocity
@@ -802,7 +805,7 @@ void mapChannel_decodeMovementPacket(mapChannelClient_t *mc, uint8 *data, uint32
 	//printf("move %f %f %f v: %f rXY: %f %f\n", posX, posY, posZ, velocity, viewX, viewY);
 }
 
-sint32 mapChannel_decodePacket(mapChannelClient_t *mc, uint8 *data, uint32 len)
+int32_t mapChannel_decodePacket(mapChannelClient_t *mc, uint8 *data, uint32_t len)
 {
 	if( mc->removeFromMap )
 		return 1;
@@ -817,11 +820,11 @@ sint32 mapChannel_decodePacket(mapChannelClient_t *mc, uint8 *data, uint32 len)
 	if( len < 4 )
 		return 0;
 
-	sint32 pIdx = 0;
+    int32_t pIdx = 0;
 	// read subSize
-	uint32 subSize = *(uint16*)(data+pIdx); pIdx += 2; // redundancy with param len
+    uint32_t subSize = *(uint16*)(data+pIdx); pIdx += 2; // redundancy with param len
 	// read major opcode
-	uint32 majorOpc = *(uint16*)(data+pIdx); pIdx += 2;
+    uint32_t majorOpc = *(uint16*)(data+pIdx); pIdx += 2;
 	if( majorOpc == 1 )
 	{
 		mapChannel_decodeMovementPacket(mc, data+pIdx, subSize-pIdx);
@@ -844,7 +847,7 @@ sint32 mapChannel_decodePacket(mapChannelClient_t *mc, uint8 *data, uint32 len)
 	if( xorCheckA != 3 ) // we only know headerA length of 3 for now
 		__debugbreak();
 
-	uint32 hdrB_start = pIdx;
+    uint32_t hdrB_start = pIdx;
 	uint8 ukn3 = *(uint8*)(data+pIdx); pIdx +=1;
 	if( ukn3 != 3 )
 		__debugbreak();
@@ -863,16 +866,16 @@ sint32 mapChannel_decodePacket(mapChannelClient_t *mc, uint8 *data, uint32 len)
 		//if( ukn0C_2 != 1 && ukn0C_2 != 3 && ukn0C_2 != 9 ) __debugbdfdsfreak(); // server entityId?
 		if( ukn0C_2 == 0 || ukn0C_2 > 0x10 ) __debugbreak(); // server entityId?
 		uint8 preffix0C_1 = *(uint8*)(data+pIdx); pIdx++;
-		if( preffix0C_1 != 7 ) __debugbreak(); // 7 --> 32-bit sint32
-		uint32 methodID = *(uint32*)(data+pIdx); pIdx += 4;
+        if( preffix0C_1 != 7 ) __debugbreak(); // 7 --> 32-bit int32_t
+        uint32_t methodID = *(uint32_t*)(data+pIdx); pIdx += 4;
 		uint8 ukn0C_3 = *(uint8*)(data+pIdx); pIdx++; // entityID?
 		if( ukn0C_3 != 1 ) __debugbreak();
 		// part 2 (0xCB)
 		if( *(uint8*)(data+pIdx) != 0xCB )
 			__debugbreak(); // wrong
 		pIdx++;
-		uint32 dataLen = 0;
-		uint32 lenMask = *(uint8*)(data+pIdx); pIdx++;
+        uint32_t dataLen = 0;
+        uint32_t lenMask = *(uint8*)(data+pIdx); pIdx++;
 		if( (lenMask>>6) == 0 )
 		{
 			// 6 bit length
@@ -902,7 +905,7 @@ void mapChannel_readData(mapChannelClient_t *mc)
 	clientGamemain_t *cgm = mc->cgm;
 	if( cgm->RecvState < 4 )
 	{
-		sint32 r = recv(cgm->socket, (char*)cgm->RecvBuffer+cgm->RecvState, 4-cgm->RecvState, 0);
+        int32_t r = recv(cgm->socket, (char*)cgm->RecvBuffer+cgm->RecvState, 4-cgm->RecvState, 0);
 		if( r == 0 || r == SOCKET_ERROR )
 		{
 			mc->removeFromMap = true;
@@ -911,10 +914,10 @@ void mapChannel_readData(mapChannelClient_t *mc)
 		}
 		cgm->RecvState += r;
 		if( cgm->RecvState == 4 )
-			cgm->RecvSize = *(uint32*)cgm->RecvBuffer + 4;
+            cgm->RecvSize = *(uint32_t*)cgm->RecvBuffer + 4;
 		return;
 	}
-	sint32 r = recv(cgm->socket, (char*)cgm->RecvBuffer+cgm->RecvState, cgm->RecvSize-cgm->RecvState, 0);
+    int32_t r = recv(cgm->socket, (char*)cgm->RecvBuffer+cgm->RecvState, cgm->RecvSize-cgm->RecvState, 0);
 	if( r == 0 || r == SOCKET_ERROR )
 	{
 		mc->removeFromMap = true;
@@ -927,12 +930,12 @@ void mapChannel_readData(mapChannelClient_t *mc)
 	{
 		// full packet received
 		// everything is encrypted, so do decryption job here
-		Tabula_Decrypt2(&cgm->tbc2, (uint32*)(cgm->RecvBuffer+4), cgm->RecvSize);
-		sint32 r = 0;
-		sint32 AlignBytes = cgm->RecvBuffer[4]%9;
+        Tabula_Decrypt2(&cgm->tbc2, (uint32_t*)(cgm->RecvBuffer+4), cgm->RecvSize);
+        int32_t r = 0;
+        int32_t AlignBytes = cgm->RecvBuffer[4]%9;
 
 		uint8 *Buffer = cgm->RecvBuffer + 4 + AlignBytes;
-		sint32 Size = cgm->RecvSize - 4 - AlignBytes;
+        int32_t Size = cgm->RecvSize - 4 - AlignBytes;
 		do{
 			uint16 Subsize = *(uint16*)Buffer;
 			mapChannel_decodePacket(mc, Buffer, Subsize);
@@ -945,7 +948,7 @@ void mapChannel_readData(mapChannelClient_t *mc)
 	return;
 }
 
-sint32 mapChannel_worker(mapChannelList_t *channelList)
+int32_t mapChannel_worker(mapChannelList_t *channelList)
 {
 	
 	FD_SET fd;
@@ -956,7 +959,7 @@ sint32 mapChannel_worker(mapChannelList_t *channelList)
 
 	// init mapchannel (map instance)
 	printf("Initializing MapChannel...\n");
-	for(sint32 chan=0; chan<channelList->mapChannelCount; chan++)
+    for(int32_t chan=0; chan<channelList->mapChannelCount; chan++)
 	{
 		mapChannel_t *mapChannel = channelList->mapChannelArray+chan;
 		if( cellMgr_initForMapChannel(mapChannel) == false )
@@ -980,7 +983,7 @@ sint32 mapChannel_worker(mapChannelList_t *channelList)
 
 	while( true )
 	{
-		for(sint32 chan=0; chan<channelList->mapChannelCount; chan++)
+        for(int32_t chan=0; chan<channelList->mapChannelCount; chan++)
 		{
 			mapChannel_t *mapChannel = channelList->mapChannelArray+chan;
 			// check for new players in queue (one per round)
@@ -991,16 +994,16 @@ sint32 mapChannel_worker(mapChannelList_t *channelList)
 			}
 			// recv client data
 			FD_ZERO(&fd);
-			for(sint32 i=0; i<mapChannel->playerCount; i++)
+            for(int32_t i=0; i<mapChannel->playerCount; i++)
 			{
 				FD_SET(mapChannel->playerList[i]->cgm->socket, &fd);
 			}
-			sint32 r = select(0, &fd, 0, 0, &sTimeout);
+            int32_t r = select(0, &fd, 0, 0, &sTimeout);
 			if( r )
 			{
-				for(sint32 i=0; i<fd.fd_count; i++)
+                for(int32_t i=0; i<fd.fd_count; i++)
 				{
-					mapChannelClient_t *mc = (mapChannelClient_t*)hashTable_get(&mapChannel->ht_socketToClient, (uint32)fd.fd_array[i]);
+                    mapChannelClient_t *mc = (mapChannelClient_t*)hashTable_get(&mapChannel->ht_socketToClient, (uint32_t)fd.fd_array[i]);
 					if( mc )
 						mapChannel_readData(mc);
 					else
@@ -1020,7 +1023,7 @@ sint32 mapChannel_worker(mapChannelList_t *channelList)
 				// do other work
 				cellMgr_doWork(mapChannel);
 				// check timers
-				uint32 currentTime = GetTickCount();
+                uint32_t currentTime = GetTickCount();
 				if( (currentTime - mapChannel->timer_clientEffectUpdate) >= 500 )
 				{
 					gameEffect_checkForPlayers(mapChannel->playerList, mapChannel->playerCount, 500);
@@ -1057,16 +1060,16 @@ sint32 mapChannel_worker(mapChannelList_t *channelList)
 				}
 				if( (currentTime - mapChannel->timer_playerUpdate) >= 1000 )
 				{
-					uint32 playerUpdateTick = currentTime - mapChannel->timer_playerUpdate;
+                    uint32_t playerUpdateTick = currentTime - mapChannel->timer_playerUpdate;
 					mapChannel->timer_playerUpdate = currentTime;
-					for(uint32 i=0; i<mapChannel->playerCount; i++)
+                    for(uint32_t i=0; i<mapChannel->playerCount; i++)
 					{
 						manifestation_updatePlayer(mapChannel->playerList[i], playerUpdateTick);
 					}
 				}
 				if( (currentTime - mapChannel->timer_generalTimer) >= 100 )
 				{
-					sint32 timePassed = 100;
+                    int32_t timePassed = 100;
 					// queue for deleting map timers
 					std::vector<mapChannelTimer_t*> queue_timerDeletion;
 					// parse through all timers
@@ -1077,7 +1080,7 @@ sint32 mapChannel_worker(mapChannelList_t *channelList)
 						(*timer)->timeLeft -= timePassed;
 						if( (*timer)->timeLeft <= 0 )
 						{
-							sint32 objTimePassed = (*timer)->period - (*timer)->timeLeft;
+                            int32_t objTimePassed = (*timer)->period - (*timer)->timeLeft;
 							(*timer)->timeLeft += (*timer)->period;
 							// trigger object
 							bool remove = (*timer)->cb(mapChannel, (*timer)->param, objTimePassed);
@@ -1090,8 +1093,8 @@ sint32 mapChannel_worker(mapChannelList_t *channelList)
 					if( queue_timerDeletion.empty() != true )
 					{
 						mapChannelTimer_t **timerList = &queue_timerDeletion[0];
-						sint32 timerCount = queue_timerDeletion.size();
-						for(sint32 f=0; f<timerCount; f++)
+                        int32_t timerCount = queue_timerDeletion.size();
+                        for(int32_t f=0; f<timerCount; f++)
 						{
 							mapChannelTimer_t* toBeDeletedTimer = timerList[f];
 							// remove from timer list
@@ -1110,15 +1113,15 @@ sint32 mapChannel_worker(mapChannelList_t *channelList)
 						}
 					}
 				
-					//sint32 count = hashTable_getCount(&mapChannel->list_timerList);
+                    //int32_t count = hashTable_getCount(&mapChannel->list_timerList);
 					//mapChannelTimer_t **timerList = (mapChannelTimer_t**)hashTable_getValueArray(&mapChannel->list_timerList);
-					//for(sint32 i=0; i<count; i++)
+                    //for(int32_t i=0; i<count; i++)
 					//{
 					//	mapChannelTimer_t *entry = timerList[i];
 					//	entry->timeLeft -= timePassed;
 					//	if( entry->timeLeft <= 0 )
 					//	{
-					//		sint32 objTimePassed = entry->period - entry->timeLeft;
+                    //		int32_t objTimePassed = entry->period - entry->timeLeft;
 					//		entry->timeLeft += entry->period;
 					//		// trigger object
 					//		bool remove = entry->cb(mapChannel, entry->param, objTimePassed);//dynamicObject_process(mapChannel, dynObjectWorkEntry->object, objTimePassed);
@@ -1135,20 +1138,20 @@ sint32 mapChannel_worker(mapChannelList_t *channelList)
 	return 0;
 }
 
-void mapChannel_start(sint32 *contextIdList, sint32 contextCount)
+void mapChannel_start(int32_t *contextIdList, int32_t contextCount)
 {
 	mapChannelList_t *mapList = (mapChannelList_t*)malloc(sizeof(mapChannelList_t));
 	mapList->mapChannelArray = (mapChannel_t*)malloc(sizeof(mapChannel_t)*contextCount);
 	mapList->mapChannelCount = 0;
 	RtlZeroMemory(mapList->mapChannelArray, sizeof(mapChannel_t)*contextCount);
-	for(sint32 i=0; i<contextCount; i++)
+    for(int32_t i=0; i<contextCount; i++)
 	{
 		// call constructor to init std::vectors
 		new(&mapList->mapChannelArray[i]) mapChannel_t();
 
-		sint32 f = -1;
+        int32_t f = -1;
 		// find by context
-		for(sint32 m=0; m<mapInfoCount; m++)
+        for(int32_t m=0; m<mapInfoCount; m++)
 		{
 			if( mapInfoArray[m].contextId == contextIdList[i] )
 			{
@@ -1187,14 +1190,14 @@ void mapChannel_init()
 	hashTable_init(&ht_mapChannelsByContextId, 8);
 }
 
-mapChannel_t *mapChannel_findByContextId(sint32 contextId)
+mapChannel_t *mapChannel_findByContextId(int32_t contextId)
 {
 	return (mapChannel_t*)hashTable_get(&ht_mapChannelsByContextId, contextId);
 }
 
 bool mapChannel_pass(mapChannel_t *mapChannel, clientGamemain_t *cgm)
 {
-	sint32 newWriteIndex = ((mapChannel->rb_playerQueueWriteIndex+1)%MAPCHANNEL_PLAYERQUEUE);
+    int32_t newWriteIndex = ((mapChannel->rb_playerQueueWriteIndex+1)%MAPCHANNEL_PLAYERQUEUE);
 	if( newWriteIndex == mapChannel->rb_playerQueueReadIndex )
 		return false; // error queue full
 	mapChannel->rb_playerQueue[mapChannel->rb_playerQueueWriteIndex] = cgm;

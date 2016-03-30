@@ -1,3 +1,9 @@
+#pragma once
+
+#include <stdint.h>
+
+struct mapChannelClient_t;
+struct creature_t;
 
 //// npc types
 //#define NPC_TYPE_NONE	0
@@ -31,8 +37,8 @@
 
 typedef struct
 {
-	//uint8 relationFlags; // is collector, dispenser, objective etc.
-	uint16 missionIndex;
+    //uint8_t relationFlags; // is collector, dispenser, objective etc.
+    uint16_t missionIndex;
 }npcDataRelatedMission_t;
 
 //#define NPC_MISSION_RFLAG_COLLECTOR	(1)
@@ -46,19 +52,19 @@ typedef struct _npc_t
 	// sint8 npcType;						// the npc type (see above)
 	// mission data
 	npcDataRelatedMission_t* relatedMissions; // list of all missions that involve this NPC type
-	sint32 relatedMissionCount;
-	sint32 npcPackageId;
+    int32_t relatedMissionCount;
+    int32_t npcPackageId;
 }npcData_t;
 
 //void npc_test(mapChannelClient_t *client);
 //
-//npc_t* npc_createNPC(mapChannel_t *mapChannel, sint32 classId, sint8 *name);
+//npc_t* npc_createNPC(mapChannel_t *mapChannel, int32_t classId, sint8 *name);
 //
 //// set (must not be called after addToWorld, does not take effect on client instantly)
 //void npc_setLocation(npc_t *npc, float x, float y, float z, float rX, float rY);
-//void npc_setType(npc_t *npc, sint32 npcType);
+//void npc_setType(npc_t *npc, int32_t npcType);
 //void npc_setMissionList(npc_t *npc, missionList_t *missionList);
-//void npc_setAppearanceEntry(npc_t *npc, sint32 entryIndex, sint32 classId, uint32 hue);
+//void npc_setAppearanceEntry(npc_t *npc, int32_t entryIndex, int32_t classId, uint32 hue);
 //
 //// update
 //void npc_updateConversationStatus(mapChannelClient_t *client, npc_t *npc);
@@ -68,19 +74,19 @@ typedef struct _npc_t
 
 void npc_creature_updateConversationStatus(mapChannelClient_t *client, creature_t *creature);
 
-void npc_recv_RequestNPCConverse(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen);
-void npc_recv_RequestNPCVending(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen);
-void npc_recv_RequestVendorSale(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen);
-void npc_recv_RequestVendorPurchase(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen);
-void npc_recv_AssignNPCMission(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen);
-void npc_recv_CompleteNPCObjective(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen);
-void npc_recv_CompleteNPCMission(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen);
+void npc_recv_RequestNPCConverse(mapChannelClient_t *cm, uint8_t *pyString, int32_t pyStringLen);
+void npc_recv_RequestNPCVending(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen);
+void npc_recv_RequestVendorSale(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen);
+void npc_recv_RequestVendorPurchase(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen);
+void npc_recv_AssignNPCMission(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen);
+void npc_recv_CompleteNPCObjective(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen);
+void npc_recv_CompleteNPCMission(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen);
 
 //
-//void npc_cellIntroduceNPCToClients(mapChannel_t *mapChannel, npc_t *npc, mapChannelClient_t **playerList, sint32 playerCount);
-//void npc_cellIntroduceNPCsToClient(mapChannel_t *mapChannel, mapChannelClient_t *client, npc_t **npcList, sint32 npcCount);
+//void npc_cellIntroduceNPCToClients(mapChannel_t *mapChannel, npc_t *npc, mapChannelClient_t **playerList, int32_t playerCount);
+//void npc_cellIntroduceNPCsToClient(mapChannel_t *mapChannel, mapChannelClient_t *client, npc_t **npcList, int32_t npcCount);
 //
-//void npc_cellDiscardNPCToClients(mapChannel_t *mapChannel, npc_t *npc, mapChannelClient_t **playerList, sint32 playerCount);
-//void npc_cellDiscardNPCsToClient(mapChannel_t *mapChannel, mapChannelClient_t *client, npc_t **npcList, sint32 npcCount);
+//void npc_cellDiscardNPCToClients(mapChannel_t *mapChannel, npc_t *npc, mapChannelClient_t **playerList, int32_t playerCount);
+//void npc_cellDiscardNPCsToClient(mapChannel_t *mapChannel, mapChannelClient_t *client, npc_t **npcList, int32_t npcCount);
 //
 void npc_init();
