@@ -1,4 +1,6 @@
-#include "global.h"
+#include "inventory.h"
+
+#include "Global.h"
 
 #define AUGMENTATION_ARMOR		 51
 #define AUGMENTATION_DECORATION	 36
@@ -18,7 +20,7 @@ item_t* inventory_CurrentWeapon(mapChannelClient_t *client)
 578
 00000F81     5A - STORE_NAME          'RequestTooltipForItemTemplateId
 */
-void item_recv_RequestTooltipForItemTemplateId(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void item_recv_RequestTooltipForItemTemplateId(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
@@ -144,11 +146,11 @@ void item_recv_RequestTooltipForItemTemplateId(mapChannelClient_t *client, uint8
 /*
 * Removes the item from the slot and also sends an update to the client
 */
-void inventory_removeItemBySlot(mapChannelClient_t *client, sint32 inventoryType, sint32 slotIndex)
+void inventory_removeItemBySlot(mapChannelClient_t *client, int32_t inventoryType, int32_t slotIndex)
 {
 	// get entityId from slot
-	sint64 entityId = 0;
-	sint32 slotType = 0;
+    int64_t entityId = 0;
+    int32_t slotType = 0;
 	if (inventoryType == INVENTORY_PERSONAL)
 	{
 		entityId = client->inventory.personalInventory[slotIndex];
@@ -186,7 +188,7 @@ void inventory_removeItemBySlot(mapChannelClient_t *client, sint32 inventoryType
 /*
 * Adds the item to the inventory and sends an update to the client
 */
-void inventory_addItemBySlot(mapChannelClient_t *client, sint32 inventoryType, sint64 entityId, sint32 slotIndex)
+void inventory_addItemBySlot(mapChannelClient_t *client, int32_t inventoryType, int64_t entityId, int32_t slotIndex)
 {
 	item_t* itemEntity = (item_t*)entityMgr_get(entityId);
 	if (itemEntity == NULL)
@@ -230,7 +232,7 @@ void inventory_addItemBySlot(mapChannelClient_t *client, sint32 inventoryType, s
 /*
 * Creates an item entity from a item template
 */
-item_t *item_create(itemTemplate_t *itemTemplate, sint32 stacksize)
+item_t *item_create(itemTemplate_t *itemTemplate, int32_t stacksize)
 {
 	if (itemTemplate == NULL)
 		return NULL; // "no-template items" must not exist
@@ -250,7 +252,7 @@ item_t *item_create(itemTemplate_t *itemTemplate, sint32 stacksize)
 * Makes a 1:1 copy of the item with a different entityId
 * The new item will have a stacksize of newStacksize
 */
-item_t* item_duplicate(item_t* item, sint32 newStacksize)
+item_t* item_duplicate(item_t* item, int32_t newStacksize)
 {
 	item_t* newItem = item_createFromTemplateId(item->itemTemplate->item.templateId, newStacksize);
 	newItem->stacksize = newStacksize;
@@ -268,11 +270,11 @@ void item_setLocationEquippedinventory(item_t *item, mapChannelClient_t *owner)
 * Tries to find an empty slot in the player's inventory
 * Return -1 if no free slot was found, returns the slot index on success
 */
-sint32 item_findFreePlayerinventorySpace(mapChannelClient_t *owner, sint32 itemType)
+int32_t item_findFreePlayerinventorySpace(mapChannelClient_t *owner, int32_t itemType)
 {
 	if (itemType == ITEMTYPE_WEAPON || itemType == ITEMTYPE_ARMOR)
 	{
-		for (sint32 i = 0; i<50; i++)
+        for (int32_t i = 0; i<50; i++)
 		{
 			if (owner->inventory.slot[i] == 0)
 			{
@@ -293,7 +295,7 @@ item_t* inventory_addItemToInventory(mapChannelClient_t *client, item_t* item)
 {
 	pyMarshalString_t pms;
 	// get item category offset
-	sint32 itemCategoryOffset = (item->itemTemplate->item.inventoryCategory - 1);
+    int32_t itemCategoryOffset = (item->itemTemplate->item.inventoryCategory - 1);
 	if (itemCategoryOffset < 0 || itemCategoryOffset >= 5)
 	{
 		printf("inventory_addItemToInventory: The item inventory category(%d) is invalid\n", itemCategoryOffset);
@@ -302,7 +304,7 @@ item_t* inventory_addItemToInventory(mapChannelClient_t *client, item_t* item)
 	itemCategoryOffset *= 50;
 	bool stackSizeChanged = false;
 	// see if we can merge the item into an already existing item
-	for (sint32 i = 0; i<50; i++)
+    for (int32_t i = 0; i<50; i++)
 	{
 		if (client->inventory.personalInventory[itemCategoryOffset + i] != 0)
 		{
@@ -312,11 +314,11 @@ item_t* inventory_addItemToInventory(mapChannelClient_t *client, item_t* item)
 			if (slotItem->itemTemplate->item.templateId != item->itemTemplate->item.templateId)
 				continue;
 			// calculate how many items we can add to the stack
-			sint32 stackAdd = slotItem->itemTemplate->item.stacksize - slotItem->stacksize;
+            int32_t stackAdd = slotItem->itemTemplate->item.stacksize - slotItem->stacksize;
 			if (stackAdd == 0)
 				continue;
 			// add item to empty slot
-			sint32 stackMove = min(stackAdd, item->stacksize);
+            int32_t stackMove = min(stackAdd, item->stacksize);
 			slotItem->stacksize += stackMove;
 			item->stacksize -= stackMove;
 			// notify client of changed stack count
@@ -350,7 +352,7 @@ item_t* inventory_addItemToInventory(mapChannelClient_t *client, item_t* item)
 		netMgr_pythonAddMethodCallRaw(client->cgm, item->entityId, SetStackCount, pym_getData(&pms), pym_getLen(&pms));
 	}
 	// find a free slot
-	for (sint32 i = 0; i<50; i++)
+    for (int32_t i = 0; i<50; i++)
 	{
 		if (client->inventory.personalInventory[itemCategoryOffset + i] == 0)
 		{
@@ -362,14 +364,14 @@ item_t* inventory_addItemToInventory(mapChannelClient_t *client, item_t* item)
 	return NULL;
 }
 
-void item_recv_PersonalInventoryMoveItem(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void item_recv_PersonalInventoryMoveItem(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
 	if (!pym_unpackTuple_begin(&pums))
 		return;
-	sint32 fromSlot = pym_unpackInt(&pums);
-	sint32 toSlot = pym_unpackInt(&pums);
+    int32_t fromSlot = pym_unpackInt(&pums);
+    int32_t toSlot = pym_unpackInt(&pums);
 	if (pums.unpackErrorEncountered)
 		return;
 	// remove item
@@ -391,15 +393,15 @@ void item_recv_PersonalInventoryMoveItem(mapChannelClient_t *client, uint8 *pySt
 	inventory_addItemBySlot(client, INVENTORY_PERSONAL, entityId, toSlot);
 }
 
-void item_recv_RequestEquipArmor(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void item_recv_RequestEquipArmor(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
 	if (!pym_unpackTuple_begin(&pums))
 		return;
-	sint32 srcSlot = pym_unpackInt(&pums); // Source Slot
-	sint32 srcInventory = pym_unpackInt(&pums); // Source Inventory
-	sint32 dstSlot = pym_unpackInt(&pums); // Destination Slot
+    int32_t srcSlot = pym_unpackInt(&pums); // Source Slot
+    int32_t srcInventory = pym_unpackInt(&pums); // Source Inventory
+    int32_t dstSlot = pym_unpackInt(&pums); // Destination Slot
 	if (pums.unpackErrorEncountered)
 		return;
 	if (srcInventory != 1)
@@ -411,8 +413,8 @@ void item_recv_RequestEquipArmor(mapChannelClient_t *client, uint8 *pyString, si
 		return;
 	if (dstSlot < 0 || dstSlot > 17)
 		return;
-	sint64 entityId_equippedItem = 0;
-	sint64 entityId_inventoryItem = 0;
+    int64_t entityId_equippedItem = 0;
+    int64_t entityId_inventoryItem = 0;
 	entityId_equippedItem = client->inventory.equippedInventory[dstSlot]; // the old equipped item (can be none)
 	entityId_inventoryItem = client->inventory.personalInventory[srcSlot]; // the new equipped item (can be none)
 	// can we equip the item?
@@ -456,15 +458,15 @@ void item_recv_RequestEquipArmor(mapChannelClient_t *client, uint8 *pyString, si
 	netMgr_cellDomain_pythonAddMethodCallRaw(client, client->player->actor->entityId, AttributeInfo, pym_getData(&pms), pym_getLen(&pms));
 }
 
-void item_recv_RequestEquipWeapon(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void item_recv_RequestEquipWeapon(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
 	if (!pym_unpackTuple_begin(&pums))
 		return;
-	sint32 srcSlot = pym_unpackInt(&pums);
-	sint32 srcInventory = pym_unpackInt(&pums);
-	sint32 dstSlot = pym_unpackInt(&pums);
+    int32_t srcSlot = pym_unpackInt(&pums);
+    int32_t srcInventory = pym_unpackInt(&pums);
+    int32_t dstSlot = pym_unpackInt(&pums);
 	if (pums.unpackErrorEncountered)
 		return;
 	if (srcInventory != 1)
@@ -477,8 +479,8 @@ void item_recv_RequestEquipWeapon(mapChannelClient_t *client, uint8 *pyString, s
 	if (dstSlot < 0 || dstSlot >= 5)
 		return;
 	// equip item
-	sint64 entityId_equippedItem = 0;
-	sint64 entityId_inventoryItem = 0;
+    int64_t entityId_equippedItem = 0;
+    int64_t entityId_inventoryItem = 0;
 	entityId_equippedItem = client->inventory.weaponDrawer[dstSlot]; // the old equipped item (can be none)
 	entityId_inventoryItem = client->inventory.personalInventory[srcSlot]; // the new equipped item (can be none)
 	// can we equip the item?
@@ -524,15 +526,15 @@ void item_recv_RequestEquipWeapon(mapChannelClient_t *client, uint8 *pyString, s
 /*
 maybe move the weapon related entries to manifestation? // i agree
 */
-void item_recv_RequestArmWeapon(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen)
+void item_recv_RequestArmWeapon(mapChannelClient_t *cm, uint8_t *pyString, int32_t pyStringLen)
 {
 	// RequestArmWeapon : 507
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
 	if (!pym_unpackTuple_begin(&pums))
 		return;
-	sint32 slot = pym_unpackInt(&pums);
-	cm->inventory.activeWeaponDrawer = (sint8)slot;
+    int32_t slot = pym_unpackInt(&pums);
+    cm->inventory.activeWeaponDrawer = (int8_t)slot;
 	// 574 Recv_WeaponDrawerSlot(self, slotNum, bRequested = True):
 	pyMarshalString_t pms;
 	pym_init(&pms);
@@ -556,7 +558,7 @@ void item_recv_RequestArmWeapon(mapChannelClient_t *cm, uint8 *pyString, sint32 
 	netMgr_pythonAddMethodCallRaw(cm->cgm, item->entityId, WeaponAmmoInfo, pym_getData(&pms), pym_getLen(&pms));
 }
 
-void item_recv_RequestWeaponDraw(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void item_recv_RequestWeaponDraw(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
@@ -574,7 +576,7 @@ void item_recv_RequestWeaponDraw(mapChannelClient_t *client, uint8 *pyString, si
 	netMgr_cellDomain_pythonAddMethodCallRaw(client->mapChannel, client->player->actor, client->player->actor->entityId, 575, pym_getData(&pms), pym_getLen(&pms));
 }
 
-void item_recv_RequestWeaponStow(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void item_recv_RequestWeaponStow(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);
@@ -596,12 +598,12 @@ void item_recv_RequestWeaponStow(mapChannelClient_t *client, uint8 *pyString, si
 * Will reduce the stack count of the passed item by the given count
 * If the stack count reaches zero, the item is deleted and removed from the inventory
 */
-void inventory_reduceStackCount(mapChannelClient_t *client, item_t* item, sint32 stackDecreaseCount)
+void inventory_reduceStackCount(mapChannelClient_t *client, item_t* item, int32_t stackDecreaseCount)
 {
 	pyMarshalString_t pms;
 	if (item->locationEntityId != client->player->actor->entityId)
 		return; // item is not on this client's inventory
-	sint32 newStackCount = (sint32)item->stacksize - stackDecreaseCount;
+    int32_t newStackCount = (int32_t)item->stacksize - stackDecreaseCount;
 	if (newStackCount <= 0)
 	{
 		// destroy item
@@ -628,7 +630,7 @@ void inventory_reduceStackCount(mapChannelClient_t *client, item_t* item, sint32
 /*
 * Called when the reload action finishes
 */
-void _cb_item_recv_RequestWeaponReload_actionUpdate(mapChannel_t* mapChannel, actor_t* actor, sint32 newActionState)
+void _cb_item_recv_RequestWeaponReload_actionUpdate(mapChannel_t* mapChannel, actor_t* actor, int32_t newActionState)
 {
 	pyMarshalString_t pms;
 	if (newActionState == ACTOR_ACTION_STATE_COMPLETE)
@@ -639,10 +641,10 @@ void _cb_item_recv_RequestWeaponReload_actionUpdate(mapChannel_t* mapChannel, ac
 		if (!item)
 			return;
 		// find and eat a piece of ammunition
-		sint32 ammoClassId = item->itemTemplate->weapon.ammoClassId;
+        int32_t ammoClassId = item->itemTemplate->weapon.ammoClassId;
 		bool foundAmmo = false;
-		sint32 foundAmmoAmount = 0;
-		for (sint32 i = 0; i<50; i++)
+        int32_t foundAmmoAmount = 0;
+        for (int32_t i = 0; i<50; i++)
 		{
 			if (client->inventory.personalInventory[INVENTORY_SLOTOFFSET_CATEGORY_CONSUMABLE + i] == 0)
 				continue;
@@ -652,7 +654,7 @@ void _cb_item_recv_RequestWeaponReload_actionUpdate(mapChannel_t* mapChannel, ac
 			if (itemAmmo->itemTemplate->item.classId == ammoClassId)
 			{
 				// consume ammo
-				sint32 ammoToGrab = min(item->itemTemplate->weapon.clipSize - foundAmmoAmount, itemAmmo->stacksize);
+                int32_t ammoToGrab = min(item->itemTemplate->weapon.clipSize - foundAmmoAmount, itemAmmo->stacksize);
 				foundAmmoAmount += ammoToGrab;
 				inventory_reduceStackCount(client, itemAmmo, ammoToGrab);
 				foundAmmo = true;
@@ -685,7 +687,7 @@ void _cb_item_recv_RequestWeaponReload_actionUpdate(mapChannel_t* mapChannel, ac
 		__debugbreak(); // reload interruption is still todo
 }
 
-void item_recv_RequestWeaponReload(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen, bool tellSelf)
+void item_recv_RequestWeaponReload(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen, bool tellSelf)
 {
 	pyMarshalString_t pms;
 	// get the weapon item
@@ -693,9 +695,9 @@ void item_recv_RequestWeaponReload(mapChannelClient_t *client, uint8 *pyString, 
 	if (!item)
 		return;
 	// find and eat a piece of ammunition
-	sint32 ammoClassId = item->itemTemplate->weapon.ammoClassId;
+    int32_t ammoClassId = item->itemTemplate->weapon.ammoClassId;
 	bool foundAmmo = false;
-	for (sint32 i = 0; i<50; i++)
+    for (int32_t i = 0; i<50; i++)
 	{
 		if (client->inventory.personalInventory[INVENTORY_SLOTOFFSET_CATEGORY_CONSUMABLE + i] == 0)
 			continue;
@@ -712,8 +714,8 @@ void item_recv_RequestWeaponReload(mapChannelClient_t *client, uint8 *pyString, 
 	if (foundAmmo == false)
 		return; // no ammo found -> Todo: Tell the client?
 	// send action start
-	sint32 reloadActionId = 134;
-	sint32 reloadActionArgId = 1;// todo: Use correct argId depending on weapon type
+    int32_t reloadActionId = 134;
+    int32_t reloadActionArgId = 1;// todo: Use correct argId depending on weapon type
 	pym_init(&pms);
 	pym_tuple_begin(&pms);
 	pym_addInt(&pms, reloadActionId); // actionId -> WEAPON_RELOAD
@@ -932,7 +934,7 @@ void inventory_notifyEquipmentUpdate(mapChannelClient_t *client)
 /*
 * Creates an item from a item templateId
 */
-item_t* item_createFromTemplateId(uint32 itemTemplateId, sint32 stacksize)
+item_t* item_createFromTemplateId(uint32 itemTemplateId, int32_t stacksize)
 {
 	itemTemplate_t *itemTemplate = gameData_getItemTemplateById(itemTemplateId);
 	if (!itemTemplate)
@@ -951,7 +953,7 @@ void inventory_initForClient(mapChannelClient_t *client)
 	pym_addInt(&pms, INVENTORY_PERSONAL); // inventoryType
 	pym_list_begin(&pms);
 	/* {itemId, slotIndex} list */
-	//for(sint32 i=0; i<250; i++)
+    //for(int32_t i=0; i<250; i++)
 	//{
 	//	if( client->inventory.personalInventory[i] != 0 )
 	//	{
@@ -1087,7 +1089,7 @@ void _inventory_initForClient(void *param, diJob_getCharacterInventory_t *jobDat
 
 	// load personal inventory
 	item_t* tempItem;
-	for (sint32 i = 0; i < 250; i++)
+    for (int32_t i = 0; i < 250; i++)
 	{
 		if (*(item + i) == 0)
 			continue;
@@ -1097,7 +1099,7 @@ void _inventory_initForClient(void *param, diJob_getCharacterInventory_t *jobDat
 	}
 
 	// load equipped inventory
-	for (sint32 i = 0; i < 17; i++)
+    for (int32_t i = 0; i < 17; i++)
 	{
 		if (*(item + i + 250) == 0)
 			continue;
@@ -1107,7 +1109,7 @@ void _inventory_initForClient(void *param, diJob_getCharacterInventory_t *jobDat
 	}
 
 	// load weapon drawer and ammo
-	for (sint32 i = 0; i < 5; i++)
+    for (int32_t i = 0; i < 5; i++)
 	{
 		if (*(item + i + 250 + 17) == 0)
 			continue;
@@ -1118,7 +1120,7 @@ void _inventory_initForClient(void *param, diJob_getCharacterInventory_t *jobDat
 	}
 
 	// send inventory data - personal inventory
-	for (sint32 i = 0; i<250; i++)
+    for (int32_t i = 0; i<250; i++)
 	{
 		if (client->inventory.personalInventory[i] == 0)
 			continue;
@@ -1131,7 +1133,7 @@ void _inventory_initForClient(void *param, diJob_getCharacterInventory_t *jobDat
 	}
 
 	// send inventory data - equipped inventory
-	for (sint32 i = 0; i<17; i++)
+    for (int32_t i = 0; i<17; i++)
 	{
 		if (client->inventory.equippedInventory[i] == 0)
 			continue;
@@ -1144,7 +1146,7 @@ void _inventory_initForClient(void *param, diJob_getCharacterInventory_t *jobDat
 	}
 
 	// send inventory data - weapon drawer
-	for (sint32 i = 0; i<5; i++)
+    for (int32_t i = 0; i<5; i++)
 	{
 		if (client->inventory.weaponDrawer[i] == 0)
 			continue;
@@ -1162,7 +1164,7 @@ void _inventory_initForClient(void *param, diJob_getCharacterInventory_t *jobDat
 	inventory_notifyEquipmentUpdate(client);
 }
 
-void item_recv_PersonalInventoryDestroyItem(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen)
+void item_recv_PersonalInventoryDestroyItem(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen)
 {
 	pyUnmarshalString_t pums;
 	pym_init(&pums, pyString, pyStringLen);

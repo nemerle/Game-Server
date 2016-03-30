@@ -1,3 +1,10 @@
+#pragma once
+
+#include <stdint.h>
+
+struct mapChannelClient_t;
+struct itemTemplate_t;
+struct diJob_getCharacterInventory_t;
 
 typedef union
 {
@@ -11,29 +18,29 @@ typedef union
 	struct  
 	{
 		unsigned long long slot[250+17+5];
-		sint8 activeWeaponDrawer;
+        int8_t activeWeaponDrawer;
 	};
 }inventory_t;
 
 typedef struct  
 {
 	unsigned long long entityId;
-	//uint32 entityClassId;
-	//uint32 itemTemplateId;
+    //uint32_t entityClassId;
+    //_t itemTemplateId;
 	// location info
 	unsigned long long locationEntityId;
-	sint32 locationSlotIndex;
+    int32_t locationSlotIndex;
 	// template
 	itemTemplate_t *itemTemplate;
 	// item instance specific
-	sint32 stacksize;
+    int32_t stacksize;
 	// item type specific
 	union
 	{
 		// we use a union to save some space
 		struct  
 		{
-			sint32 ammoCount; // amount of remaining ammo
+            int32_t ammoCount; // amount of remaining ammo
 		}weaponData;
 	};
 }item_t;
@@ -44,25 +51,25 @@ item_t* inventory_CurrentWeapon(mapChannelClient_t *client);
 
 void inventory_notifyEquipmentUpdate(mapChannelClient_t *client);
 
-void inventory_removeItemBySlot(mapChannelClient_t *client, sint32 inventoryType, sint32 slotIndex);
-void inventory_addItemBySlot(mapChannelClient_t *client, sint32 inventoryType, sint64 entityId, sint32 slotIndex);
+void inventory_removeItemBySlot(mapChannelClient_t *client, int32_t inventoryType, int32_t slotIndex);
+void inventory_addItemBySlot(mapChannelClient_t *client, int32_t inventoryType, int64_t entityId, int32_t slotIndex);
 item_t* inventory_addItemToInventory(mapChannelClient_t *client, item_t* item);
 
-item_t* item_createFromTemplateId(uint32 itemTemplateId, sint32 stacksize);
-item_t* item_duplicate(item_t* item, sint32 newStacksize);
+item_t* item_createFromTemplateId(uint32_t itemTemplateId, int32_t stacksize);
+item_t* item_duplicate(item_t* item, int32_t newStacksize);
 void item_sendItemCreation(mapChannelClient_t* client, item_t *item);
 void item_sendItemDestruction(mapChannelClient_t *client, item_t *item);
 void item_free(item_t* item);
 
-void item_recv_RequestTooltipForItemTemplateId(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen);
-void item_recv_PersonalInventoryDestroyItem(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen);
-void item_recv_PersonalInventoryMoveItem(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen);
-void item_recv_RequestEquipArmor(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen);
-void item_recv_RequestEquipWeapon(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen);
-void item_recv_RequestArmWeapon(mapChannelClient_t *cm, uint8 *pyString, sint32 pyStringLen);
-void item_recv_RequestWeaponDraw(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen);
-void item_recv_RequestWeaponStow(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen);
-void item_recv_RequestWeaponReload(mapChannelClient_t *client, uint8 *pyString, sint32 pyStringLen, bool tellSelf);
+void item_recv_RequestTooltipForItemTemplateId(mapChannelClient_t *cm, uint8_t *pyString, int32_t pyStringLen);
+void item_recv_PersonalInventoryDestroyItem(mapChannelClient_t *cm, uint8_t *pyString, int32_t pyStringLen);
+void item_recv_PersonalInventoryMoveItem(mapChannelClient_t *cm, uint8_t *pyString, int32_t pyStringLen);
+void item_recv_RequestEquipArmor(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen);
+void item_recv_RequestEquipWeapon(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen);
+void item_recv_RequestArmWeapon(mapChannelClient_t *cm, uint8_t *pyString, int32_t pyStringLen);
+void item_recv_RequestWeaponDraw(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen);
+void item_recv_RequestWeaponStow(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen);
+void item_recv_RequestWeaponReload(mapChannelClient_t *client, uint8_t *pyString, int32_t pyStringLen, bool tellSelf);
 
 #define INVENTORY_SLOTOFFSET_PLAYER			0
 #define INVENTORY_SLOTOFFSET_EQUIPPED		250

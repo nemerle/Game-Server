@@ -1,4 +1,4 @@
-#include"global.h"
+#include"Global.h"
 
 /*
  * Returns true if the actor is currently executing an action
@@ -34,7 +34,7 @@ bool _cb_actor_actionCompletedTimer(mapChannel_t* mapChannel, void* param, sint3
 /*
  * Starts a new action on a given entityId
  */
-void actor_startActionOnEntity(mapChannel_t* mapChannel, actor_t* actor, sint64 targetEntityId, sint32 actionId, sint32 actionArgId, sint32 windupTime, sint32 recoverTime, void(*actorActionUpdateCallback)(mapChannel_t* mapChannel, actor_t* actor, sint32 newActionState))
+void actor_startActionOnEntity(mapChannel_t* mapChannel, actor_t* actor, int64_t targetEntityId, sint32 actionId, sint32 actionArgId, sint32 windupTime, sint32 recoverTime, void(*actorActionUpdateCallback)(mapChannel_t* mapChannel, actor_t* actor, sint32 newActionState))
 {
 	if( actor->currentAction.actionId != 0 )
 		return;
