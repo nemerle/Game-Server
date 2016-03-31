@@ -1,26 +1,26 @@
 // ids are used only for the database
 #pragma once
 enum ObjectType_IDs {
-	ControlPoint			= 1,
-	WaypointTeleporter		= 2,
-	Hospital				= 3,
-	CraftingStation			= 4,
-	InstanceEntrance		= 5,
-	BattlefieldEntrance		= 6,
-	LocalTeleporter			= 7,
-	WormholeTeleporter		= 8,
-	DropshipTeleporter		= 9,
-	Footlocker				= 10,
-	ClanFootLocker			= 11,
-	BaneDropShip			= 12,
-	HumanDropShip			= 13,
-	Logos					= 14,
-	DoorTrigger				= 15,
-	Auctioneer				= 16,
-	Forcefield				= 17,
-	AFSTuret				= 18,
-	ToriodCannon			= 19,
-	Undefined				= 20
+    ControlPoint            = 1,
+    WaypointTeleporter        = 2,
+    Hospital                = 3,
+    CraftingStation            = 4,
+    InstanceEntrance        = 5,
+    BattlefieldEntrance        = 6,
+    LocalTeleporter            = 7,
+    WormholeTeleporter        = 8,
+    DropshipTeleporter        = 9,
+    Footlocker                = 10,
+    ClanFootLocker            = 11,
+    BaneDropShip            = 12,
+    HumanDropShip            = 13,
+    Logos                    = 14,
+    DoorTrigger                = 15,
+    Auctioneer                = 16,
+    Forcefield                = 17,
+    AFSTuret                = 18,
+    ToriodCannon            = 19,
+    Undefined                = 20
 };
 
 void dynamicObject_init(mapChannel_t *mapChannel);
@@ -36,48 +36,48 @@ void dynamicObject_recv_RequestActionInterrupt(mapChannelClient_t *client, uint8
 
 typedef struct  
 {
-	//void (*init)(mapChannel_t *mapChannel, dynObject_t *dynObject); // called right after creation of the object
-	void (*destroy)(mapChannel_t *mapChannel, dynObject_t *dynObject); // called before free()
-	void (*appearForPlayers)(mapChannel_t *mapChannel, dynObject_t *dynObject, mapChannelClient_t **playerList, sint32 playerCount);	// enter sight, created
-	void (*disappearForPlayers)(mapChannel_t *mapChannel, dynObject_t *dynObject, mapChannelClient_t **playerList, sint32 playerCount); // leave sight, deleted
-	bool (*periodicCallback)(mapChannel_t *mapChannel, dynObject_t *dynObject, uint8 timerID, sint32 timePassed); // timerId can be used to distinguish between multiple timers on the same object, timePassed is the time since the last callback in MS 	
-	void (*useObject)(mapChannel_t *mapChannel, dynObject_t *dynObject, mapChannelClient_t* client, sint32 actionID, sint32 actionArg);
-	void (*interruptUse)(mapChannel_t *mapChannel, dynObject_t *dynObject, mapChannelClient_t* client, sint32 actionID, sint32 actionArg);
-	//void (*completeUse)(mapChannel_t *mapChannel, dynObject_t *dynObject, mapChannelClient_t* client, sint32 actionID, sint32 actionArg);
+    //void (*init)(mapChannel_t *mapChannel, dynObject_t *dynObject); // called right after creation of the object
+    void (*destroy)(mapChannel_t *mapChannel, dynObject_t *dynObject); // called before free()
+    void (*appearForPlayers)(mapChannel_t *mapChannel, dynObject_t *dynObject, mapChannelClient_t **playerList, sint32 playerCount);    // enter sight, created
+    void (*disappearForPlayers)(mapChannel_t *mapChannel, dynObject_t *dynObject, mapChannelClient_t **playerList, sint32 playerCount); // leave sight, deleted
+    bool (*periodicCallback)(mapChannel_t *mapChannel, dynObject_t *dynObject, uint8 timerID, sint32 timePassed); // timerId can be used to distinguish between multiple timers on the same object, timePassed is the time since the last callback in MS     
+    void (*useObject)(mapChannel_t *mapChannel, dynObject_t *dynObject, mapChannelClient_t* client, sint32 actionID, sint32 actionArg);
+    void (*interruptUse)(mapChannel_t *mapChannel, dynObject_t *dynObject, mapChannelClient_t* client, sint32 actionID, sint32 actionArg);
+    //void (*completeUse)(mapChannel_t *mapChannel, dynObject_t *dynObject, mapChannelClient_t* client, sint32 actionID, sint32 actionArg);
 }dynObjectType_t;
 
 typedef struct _dynObject_t
 {
-	unsigned long long entityId;
-	//uint16 objectType;
-	dynObjectType_t* type;
-	unsigned long long entityClassId;
-	void *objectData;
-	// universal position data
-	float x;
-	float y;
-	float z;
-	float rotX;
-	float rotY;
-	float rotZ;
-	//float velocity;
-	//float viewX;
-	//float viewY;
-	// useable data
-	sint32 stateId;
-	sint32 contextId;
-	sint32 contested;
-	// todo: rotation quarterninion
-	mapCellLocation_t cellLocation;
+    unsigned long long entityId;
+    //uint16 objectType;
+    dynObjectType_t* type;
+    unsigned long long entityClassId;
+    void *objectData;
+    // universal position data
+    float x;
+    float y;
+    float z;
+    float rotX;
+    float rotY;
+    float rotZ;
+    //float velocity;
+    //float viewX;
+    //float viewY;
+    // useable data
+    sint32 stateId;
+    sint32 contextId;
+    sint32 contested;
+    // todo: rotation quarterninion
+    mapCellLocation_t cellLocation;
 }dynObject_t;
 
 typedef struct
 {
-	sint32 period;
-	sint32 timeLeft;
-	dynObject_t *object;
-	uint8 timerID;
-	unsigned long long entityId;
+    sint32 period;
+    sint32 timeLeft;
+    dynObject_t *object;
+    uint8 timerID;
+    unsigned long long entityId;
 }dynObject_workEntry_t; 
 
 void dynamicObject_cellIntroduceObjectToClients(mapChannel_t *mapChannel, dynObject_t *dynObj, mapChannelClient_t **playerList, sint32 playerCount);
@@ -89,8 +89,8 @@ void dynamicObject_check(mapChannel_t *mapChannel, sint32 timePassed);
 bool dynamicObject_process(mapChannel_t *mapChannel, dynObject_t *dynObject, sint32 timePassed);
 
 // useable states (for force state)
-#define USE_ID_STATE_ACTIVE		81	 // augmentation [34]
-#define USE_ID_STATE_INACTIVE	82	 // augmentation [34]
+#define USE_ID_STATE_ACTIVE        81     // augmentation [34]
+#define USE_ID_STATE_INACTIVE    82     // augmentation [34]
 
 
 // developer / testing

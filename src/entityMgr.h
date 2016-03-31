@@ -1,11 +1,11 @@
 void entityMgr_init();
 
-#define ENTITYTYPE_PLAYER	0
-#define ENTITYTYPE_CLIENT	1
-#define ENTITYTYPE_ITEM		2
-#define ENTITYTYPE_OBJECT	3
-//#define ENTITYTYPE_NPC		4 (removed)
-#define ENTITYTYPE_CREATURE	5
+#define ENTITYTYPE_PLAYER    0
+#define ENTITYTYPE_CLIENT    1
+#define ENTITYTYPE_ITEM        2
+#define ENTITYTYPE_OBJECT    3
+//#define ENTITYTYPE_NPC        4 (removed)
+#define ENTITYTYPE_CREATURE    5
 
 unsigned long long entityMgr_getFreeEntityIdForClient();
 unsigned long long entityMgr_getFreeEntityIdForPlayer();

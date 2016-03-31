@@ -25,19 +25,19 @@
 
 namespace Thread
 {
-	//static unsigned int ThreadsCount = 1;
-	void InitMutex(TMutex* Mutex);
-	void DestroyMutex(TMutex* Mutex);
-	void LockMutex(TMutex* Mutex);
-	void UnlockMutex(TMutex* Mutex);
+    //static unsigned int ThreadsCount = 1;
+    void InitMutex(TMutex* Mutex);
+    void DestroyMutex(TMutex* Mutex);
+    void LockMutex(TMutex* Mutex);
+    void UnlockMutex(TMutex* Mutex);
 
-	// todo: check for open handle leaks
-	bool New(thread_id* id, THREAD_ROUTINE2,void* Parameter);
-	bool Cancel(thread_id id);
-	void Join(thread_id id);
-	void Exit();
-	//unsigned int  Count();
-	//void IncreaseCount();
-	//void DecreaseCount();
+    // todo: check for open handle leaks
+    bool New(thread_id* id, THREAD_ROUTINE2,void* Parameter);
+    bool Cancel(thread_id id);
+    void Join(thread_id id);
+    void Exit();
+    //unsigned int  Count();
+    //void IncreaseCount();
+    //void DecreaseCount();
 }
 #endif

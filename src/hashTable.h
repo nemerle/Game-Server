@@ -1,16 +1,16 @@
 
 typedef struct  
 {
-	sint32 itemIndex;
+    sint32 itemIndex;
 }_HashTable_uint32Iterable_entry_t;
 
 typedef struct
 {
-	_HashTable_uint32Iterable_entry_t *entrys;
-	uint32 *itemKeyArray;
-	void **itemValueArray;
-	uint32 size;
-	uint32 count;
+    _HashTable_uint32Iterable_entry_t *entrys;
+    uint32 *itemKeyArray;
+    void **itemValueArray;
+    uint32 size;
+    uint32 count;
 }hashTable_t;
 
 void hashTable_init(hashTable_t *hashTable, sint32 itemLimit);
@@ -28,12 +28,12 @@ void *hashTable_get(hashTable_t *hashTable, sint8 *key);
 
 typedef struct
 {
-	_HashTable_uint32Iterable_entry_t *entrys;
-	uint32 *itemKeyArray;
-	void **itemValueArray;
-	uint32 size;
-	uint32 count;
-	TMutex criticalSection;
+    _HashTable_uint32Iterable_entry_t *entrys;
+    uint32 *itemKeyArray;
+    void **itemValueArray;
+    uint32 size;
+    uint32 count;
+    TMutex criticalSection;
 }hashTableSynced_t;
 
 void hashTable_init(hashTableSynced_t *hashTable, sint32 itemLimit);

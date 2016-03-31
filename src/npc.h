@@ -6,8 +6,8 @@ struct mapChannelClient_t;
 struct creature_t;
 
 //// npc types
-//#define NPC_TYPE_NONE	0
-//#define NPC_TYPE_VENDOR	1
+//#define NPC_TYPE_NONE    0
+//#define NPC_TYPE_VENDOR    1
 
 // conversation types
 #define CONVO_STATUS_NONE 0
@@ -32,8 +32,8 @@ struct creature_t;
 #define CONVO_STATUS_WARGAME_NEUTRAL 19
 #define CONVO_STATUS_WARGAME_HOSTILE_SAFE 20
 #define CONVO_STATUS_WARGAME_FRIENDLY_SAFE 21
-#define	CONVO_STATUS_WARGAME_NEUTRAL_SAFE 22
-#define	CONVO_STATUS_IDLE 23
+#define    CONVO_STATUS_WARGAME_NEUTRAL_SAFE 22
+#define    CONVO_STATUS_IDLE 23
 
 typedef struct
 {
@@ -41,17 +41,17 @@ typedef struct
     uint16_t missionIndex;
 }npcDataRelatedMission_t;
 
-//#define NPC_MISSION_RFLAG_COLLECTOR	(1)
-//#define NPC_MISSION_RFLAG_DISPENSOR	(2)
-//#define NPC_MISSION_RFLAG_OBJECTIVE	(4)
+//#define NPC_MISSION_RFLAG_COLLECTOR    (1)
+//#define NPC_MISSION_RFLAG_DISPENSOR    (2)
+//#define NPC_MISSION_RFLAG_OBJECTIVE    (4)
 
 
 typedef struct _npc_t 
 {
-	//missionList_t *missionList;		// available missions
-	// sint8 npcType;						// the npc type (see above)
-	// mission data
-	npcDataRelatedMission_t* relatedMissions; // list of all missions that involve this NPC type
+    //missionList_t *missionList;        // available missions
+    // sint8 npcType;                        // the npc type (see above)
+    // mission data
+    npcDataRelatedMission_t* relatedMissions; // list of all missions that involve this NPC type
     int32_t relatedMissionCount;
     int32_t npcPackageId;
 }npcData_t;

@@ -58,44 +58,44 @@ struct file_t
 file_t *fileMgr_open(const char *name)
 {
 #ifdef WIN32
-	HANDLE hFile = CreateFile((LPCSTR)name, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
-	if( hFile == INVALID_HANDLE_VALUE )
-		return NULL;
+    HANDLE hFile = CreateFile((LPCSTR)name, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, 0, 0);
+    if( hFile == INVALID_HANDLE_VALUE )
+        return NULL;
 #else
     FILE * hFile = fopen(name,"rb");
     if(!hFile)
         return NULL;
 #endif
-	file_t *file = (file_t*)malloc(sizeof(file_t));
-	file->hFile = hFile;
-	return file;
+    file_t *file = (file_t*)malloc(sizeof(file_t));
+    file->hFile = hFile;
+    return file;
 }
 
 file_t *fileMgr_create(const char * name)
 {
 #ifdef WIN32
     HANDLE hFile = CreateFile((LPCSTR)name, FILE_ALL_ACCESS, FILE_SHARE_READ, 0, CREATE_ALWAYS, 0, 0);
-	if( hFile == INVALID_HANDLE_VALUE )
-		return NULL;
+    if( hFile == INVALID_HANDLE_VALUE )
+        return NULL;
 #else
     FILE *hFile = fopen(name,"w+");
 #endif
-	file_t *file = (file_t*)malloc(sizeof(file_t));
-	file->hFile = hFile;
-	return file;
+    file_t *file = (file_t*)malloc(sizeof(file_t));
+    file->hFile = hFile;
+    return file;
 }
 
 void fileMgr_close(file_t *file)
 {
-	if( file )
-	{
+    if( file )
+    {
 #ifdef WIN32
         CloseHandle(file->hFile);
 #else
         fclose(file->hFile);
 #endif
-		free((void*)file);
-	}
+        free((void*)file);
+    }
 }
 
 
@@ -145,7 +145,7 @@ int8_t fileMgr_readS8(file_t *file)
 {
     int8_t value;
     file->read(value);
-	return value;
+    return value;
 }
 
 int16_t fileMgr_readS16(file_t *file)
@@ -185,7 +185,7 @@ uint32_t fileMgr_readU32(file_t *file)
 
 float fileMgr_readFloat(file_t *file)
 {
-	float value;
+    float value;
     file->read(value);
     return value;
 }
@@ -198,37 +198,37 @@ void fileMgr_readData(file_t *file, void *data, int32_t len)
 
 int8_t *fileMgr_readLine(file_t *file)
 {
-	// todo: optimize this..
+    // todo: optimize this..
     uint32_t currentSeek =fileMgr_getSeek(file);
     long fileSize = file->size();
     long maxLen = fileSize - currentSeek;
-	if( maxLen == 0 )
-		return NULL; // eof reached
-	// begin parsing
+    if( maxLen == 0 )
+        return NULL; // eof reached
+    // begin parsing
     int8_t *cstr = (int8_t*)malloc(512);
     int32_t size = 0;
     int32_t limit = 512;
-	while( maxLen )
-	{
-		maxLen--;
+    while( maxLen )
+    {
+        maxLen--;
         int8_t n = fileMgr_readS8(file);
-		if( n == '\r' )
-			continue; // skip
-		if( n == '\n' )
-			break; // line end
-		cstr[size] = n;
-		size++;
-		if( size == limit )
+        if( n == '\r' )
+            continue; // skip
+        if( n == '\n' )
+            break; // line end
+        cstr[size] = n;
+        size++;
+        if( size == limit )
             assert(false);
-	}
-	cstr[size] = '\0';
-	return cstr;
+    }
+    cstr[size] = '\0';
+    return cstr;
 }
 
 void fileMgr_setSeek(file_t *file, uint32_t seek)
 {
 #ifdef WIN32
-	SetFilePointer(file->hFile, seek, NULL, FILE_BEGIN);
+    SetFilePointer(file->hFile, seek, NULL, FILE_BEGIN);
 #else
     fseek(file->hFile,seek,SEEK_SET);
 #endif

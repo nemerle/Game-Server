@@ -4,18 +4,18 @@ struct file_t;
 struct sData_optionLine_t
 {
     char *optionName;
-	sint8 *optionData;
+    sint8 *optionData;
 };
 
 struct sData_t
 {
-	file_t *file;
-	// current category settings
-	sint8 *categoryName;
-	DWORD categoryDataOffset;
-	// option data
-	sint32 optionLineCount;
-	sData_optionLine_t *optionLine;
+    file_t *file;
+    // current category settings
+    sint8 *categoryName;
+    DWORD categoryDataOffset;
+    // option data
+    sint32 optionLineCount;
+    sData_optionLine_t *optionLine;
 };
 
 sData_t *sData_open(sint8 *path);

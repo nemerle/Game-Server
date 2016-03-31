@@ -1,8 +1,8 @@
 //Maximale Bignum größe in Bytes
-#define BignumSize 256	//Wert: 0 - 2^65536 
+#define BignumSize 256    //Wert: 0 - 2^65536 
 //Bignum Sturktur
 typedef struct{
-	uint8 d[BignumSize];
+    uint8 d[BignumSize];
 }BIGNUM;
 
 

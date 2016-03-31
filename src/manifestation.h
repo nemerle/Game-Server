@@ -4,8 +4,8 @@
  * Skill related stuff
  */
 
-#define SKILL_COUNT		73
-#define LOGOS_COUNT		409
+#define SKILL_COUNT        73
+#define LOGOS_COUNT        409
 
 // table for skillIndex to skillID mapping
 static sint32 skillIdx2ID[SKILL_COUNT] =
@@ -24,27 +24,27 @@ static sint32 skillIdx2ID[SKILL_COUNT] =
 // table for skillID to skillIndex mapping
 static sint32 skillID2Idx[200] =
 {
-	-1,0,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,2,-1,-1,-1,-1,3,
-	4,5,6,7,8,9,10,-1,11,-1,12,13,14,-1,15,16,17,18,-1,19,
-	20,-1,-1,21,-1,-1,-1,22,23,24,25,-1,-1,-1,26,27,-1,28,29,-1,
-	-1,-1,-1,30,-1,-1,31,32,33,-1,-1,-1,34,35,-1,-1,-1,36,-1,37,
-	38,-1,39,-1,-1,-1,-1,-1,-1,40,-1,-1,41,-1,-1,-1,-1,-1,-1,-1,
-	-1,-1,42,-1,-1,-1,-1,-1,-1,-1,43,44,-1,45,46,-1,-1,-1,-1,-1,
-	-1,47,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,48,49,-1,-1,-1,
-	-1,-1,-1,-1,-1,-1,-1,50,51,52,53,54,55,56,57,58,59,60,61,62,
-	63,64,65,66,67,68,69,-1,-1,-1,-1,-1,70,71,72,-1,-1,-1,-1,-1,
-	-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
+    -1,0,-1,-1,-1,-1,-1,-1,1,-1,-1,-1,-1,-1,2,-1,-1,-1,-1,3,
+    4,5,6,7,8,9,10,-1,11,-1,12,13,14,-1,15,16,17,18,-1,19,
+    20,-1,-1,21,-1,-1,-1,22,23,24,25,-1,-1,-1,26,27,-1,28,29,-1,
+    -1,-1,-1,30,-1,-1,31,32,33,-1,-1,-1,34,35,-1,-1,-1,36,-1,37,
+    38,-1,39,-1,-1,-1,-1,-1,-1,40,-1,-1,41,-1,-1,-1,-1,-1,-1,-1,
+    -1,-1,42,-1,-1,-1,-1,-1,-1,-1,43,44,-1,45,46,-1,-1,-1,-1,-1,
+    -1,47,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,48,49,-1,-1,-1,
+    -1,-1,-1,-1,-1,-1,-1,50,51,52,53,54,55,56,57,58,59,60,61,62,
+    63,64,65,66,67,68,69,-1,-1,-1,-1,-1,70,71,72,-1,-1,-1,-1,-1,
+    -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1
 };
 
 // table for skillIndex to ability mapping
 static sint32 skillIdx2AbilityID[SKILL_COUNT] = 
 {
-	-1, -1, -1, -1, 137, -1, -1, -1, -1, 178, 177, 158, -1, -1, 
-	197, 186, 188, 162, 187, -1, -1, 233, 234, -1, 194, -1, -1, 
-	-1, -1, -1, 301, -1, -1, 185, 251, 240, 302, 232, 229, -1, 
-	231, 305, 392, 252, 282, 381, 267, 298, 246, 253, 307, 393, 
-	281, 390, 295, 304, 386, 193, 385, 176, 260, 384, 383, 303, 
-	388, 389, 387, 380, 401, 430, 262, 421, 446
+    -1, -1, -1, -1, 137, -1, -1, -1, -1, 178, 177, 158, -1, -1, 
+    197, 186, 188, 162, 187, -1, -1, 233, 234, -1, 194, -1, -1, 
+    -1, -1, -1, 301, -1, -1, 185, 251, 240, 302, 232, 229, -1, 
+    231, 305, 392, 252, 282, 381, 267, 298, 246, 253, 307, 393, 
+    281, 390, 295, 304, 386, 193, 385, 176, 260, 384, 383, 303, 
+    388, 389, 387, 380, 401, 430, 262, 421, 446
 };
 
 #define manifestation_getSkillIndexById(skid) ((skid)<0?-1:((skid)>=200?-1:(skillID2Idx[(skid)])))
@@ -206,35 +206,35 @@ static sint32 skillIdx2AbilityID[SKILL_COUNT] =
  */
 typedef struct _manifestation_t
 {
-	actor_t *actor;
-	actorAppearanceData_t appearanceData[21];
-	//long long controllerUserId;
-	mapChannelClient_t *controllerUser;
-	sint32 raceId;
-	sint32 classId;
-	//sint32 level; --> moved to actor.stats.level
-	bool genderIsMale;
-	unsigned long long targetEntityId;
-	unsigned long long actionEntityId;
-	sint32 abilityDrawer[5*5];
-	sint32 abilityLvDrawer[5*5];
-	sint8 currentAbilityDrawer;
-	// skills
-	uint8 skill[SKILL_COUNT];
-	// manifestation (player) specific stats
-	uint32 credits;  // credit type 0 (fund)
-	uint32 prestige; // credit type 1 (prestige)
-	uint32 experience;
-	uint32 spentAttributePoints_body;
-	uint32 spentAttributePoints_mind;
-	uint32 spentAttributePoints_spirit;
-	// mission log
-	missionLogEntry_t missionLog[MISSION_LOG_LIMIT]; // must be sorted by missionId to allow binary search
-	sint32 activeMissionCount; // number of missions in the mission log
-	// mission state map (completed/not completed bitmask of ALL missions)
-	uint8* missionStateMap;
-	// gamemaster/admin data
-	gmData_t* gmData;
+    actor_t *actor;
+    actorAppearanceData_t appearanceData[21];
+    //long long controllerUserId;
+    mapChannelClient_t *controllerUser;
+    sint32 raceId;
+    sint32 classId;
+    //sint32 level; --> moved to actor.stats.level
+    bool genderIsMale;
+    unsigned long long targetEntityId;
+    unsigned long long actionEntityId;
+    sint32 abilityDrawer[5*5];
+    sint32 abilityLvDrawer[5*5];
+    sint8 currentAbilityDrawer;
+    // skills
+    uint8 skill[SKILL_COUNT];
+    // manifestation (player) specific stats
+    uint32 credits;  // credit type 0 (fund)
+    uint32 prestige; // credit type 1 (prestige)
+    uint32 experience;
+    uint32 spentAttributePoints_body;
+    uint32 spentAttributePoints_mind;
+    uint32 spentAttributePoints_spirit;
+    // mission log
+    missionLogEntry_t missionLog[MISSION_LOG_LIMIT]; // must be sorted by missionId to allow binary search
+    sint32 activeMissionCount; // number of missions in the mission log
+    // mission state map (completed/not completed bitmask of ALL missions)
+    uint8* missionStateMap;
+    // gamemaster/admin data
+    gmData_t* gmData;
 }manifestation_t;
 
 void manifestation_createPlayerCharacter(mapChannel_t *mapChannel, mapChannelClient_t *owner, di_characterData_t *characterData);
@@ -286,57 +286,57 @@ void manifestation_updatePlayer(mapChannelClient_t* mapChannelClient, sint32 tic
  */
 static sint32 experienceTable[50+1] =
 {
-	0, // level 1
-	3000, // level 2
-	10500, // level 3
-	24000, // level 4
-	43000, // level 5
-	69500, // level 6
-	103500, // level 7
-	148500, // level 8
-	204000, // level 9
-	272500, // level 10
-	356000, // level 11
-	456500, // level 12
-	577000, // level 13
-	719500, // level 14
-	886500, // level 15
-	1082500, // level 16
-	1310500, // level 17
-	1575000, // level 18
-	1879500, // level 19
-	2230000, // level 20
-	2632500, // level 21
-	3091500, // level 22
-	3616500, // level 23
-	4212000, // level 24
-	4888500, // level 25
-	5654500, // level 26
-	6520500, // level 27
-	7497500, // level 28
-	8598500, // level 29
-	9837000, // level 30
-	11228000, // level 31
-	12788500, // level 32
-	14538500, // level 33
-	16496000, // level 34
-	18683000, // level 35
-	21125000, // level 36
-	23850000, // level 37
-	26887500, // level 38
-	30269000, // level 39
-	34031000, // level 40
-	38211000, // level 41
-	42853500, // level 42
-	48006500, // level 43
-	53721000, // level 44
-	60055000, // level 45
-	67069500, // level 46
-	74833500, // level 47
-	83421500, // level 48
-	92917500, // level 49
-	103410000, // level 50
-	0x7FFFFFFF // max possible value (dont remove)
+    0, // level 1
+    3000, // level 2
+    10500, // level 3
+    24000, // level 4
+    43000, // level 5
+    69500, // level 6
+    103500, // level 7
+    148500, // level 8
+    204000, // level 9
+    272500, // level 10
+    356000, // level 11
+    456500, // level 12
+    577000, // level 13
+    719500, // level 14
+    886500, // level 15
+    1082500, // level 16
+    1310500, // level 17
+    1575000, // level 18
+    1879500, // level 19
+    2230000, // level 20
+    2632500, // level 21
+    3091500, // level 22
+    3616500, // level 23
+    4212000, // level 24
+    4888500, // level 25
+    5654500, // level 26
+    6520500, // level 27
+    7497500, // level 28
+    8598500, // level 29
+    9837000, // level 30
+    11228000, // level 31
+    12788500, // level 32
+    14538500, // level 33
+    16496000, // level 34
+    18683000, // level 35
+    21125000, // level 36
+    23850000, // level 37
+    26887500, // level 38
+    30269000, // level 39
+    34031000, // level 40
+    38211000, // level 41
+    42853500, // level 42
+    48006500, // level 43
+    53721000, // level 44
+    60055000, // level 45
+    67069500, // level 46
+    74833500, // level 47
+    83421500, // level 48
+    92917500, // level 49
+    103410000, // level 50
+    0x7FFFFFFF // max possible value (dont remove)
 };
 
 sint32 manifestation_getLevelByExperience(sint32 xp);

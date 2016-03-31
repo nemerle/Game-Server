@@ -1,8 +1,8 @@
 
-#define CELL_SIZE	25.0f //32.0f
+#define CELL_SIZE    25.0f //32.0f
 #define CELL_VIEWRANGE 2 // 2 cells in evers direction
 
-#define CELL_BIAS	32768.0f
+#define CELL_BIAS    32768.0f
 
 /*
  * A map cell trigger area is an box shaped area on the map with callbacks for various player events
@@ -15,37 +15,37 @@
  */
 typedef struct  
 {
-	float minBoundX;
-	float minBoundY;
-	float minBoundZ;
-	float maxBoundX;
-	float maxBoundY;
-	float maxBoundZ;
+    float minBoundX;
+    float minBoundY;
+    float minBoundZ;
+    float maxBoundX;
+    float maxBoundY;
+    float maxBoundZ;
 }mapCellTriggerArea_t;
 
 typedef struct  
 {
-	sint32 cellX;
-	sint32 cellZ;
-	std::vector<mapChannelClient_t*> ht_playerList; // players currently in this cell
-	std::vector<mapChannelClient_t*> ht_playerNotifyList; // players that currently see this cell and should be informed about updates
-	std::vector<dynObject_t*> ht_objectList; // dynamic gameobjects that are in the cell
-	std::vector<creature_t*> ht_creatureList; // dynamic creatures that are in the cell
+    sint32 cellX;
+    sint32 cellZ;
+    std::vector<mapChannelClient_t*> ht_playerList; // players currently in this cell
+    std::vector<mapChannelClient_t*> ht_playerNotifyList; // players that currently see this cell and should be informed about updates
+    std::vector<dynObject_t*> ht_objectList; // dynamic gameobjects that are in the cell
+    std::vector<creature_t*> ht_creatureList; // dynamic creatures that are in the cell
 }mapCell_t;
 
 typedef struct  
 {
-	sint32 x;
-	sint32 z;
+    sint32 x;
+    sint32 z;
 }mapCellLocation_t;
 
 typedef struct  
 {
-	hashTable_t ht_cells;
-	sint32 loadedCellCount;
-	sint32 loadedCellLimit;
-	mapCell_t **loadedCellList;
-	uint32 time_updateVisibility;
+    hashTable_t ht_cells;
+    sint32 loadedCellCount;
+    sint32 loadedCellLimit;
+    mapCell_t **loadedCellList;
+    uint32 time_updateVisibility;
 }mapCellInfo_t;
 
 
